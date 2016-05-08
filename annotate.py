@@ -42,7 +42,7 @@ directory = os.getcwd() + "/Images/"
 results = {}
 
 for img in os.listdir(directory):
-	x = ce.run_inference_on_image(directory + img,1)
+	x = ce.run_inference_on_image(directory + img,3)
 	results[img] = x
 	print "..."
 
