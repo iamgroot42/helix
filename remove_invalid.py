@@ -1,19 +1,19 @@
 import numpy as np
 import cv2
 import os
-import Image
+import imghdr
 
 
 def is_image_ok(fn):
-    try:
-        Image.open(fn)
-        return True
-    except:
-        return False
+	print imghdr.what(fn)
+	if imghdr.what(fn) == 'jpeg':
+		return True
+	return False
 
 
 path = "Images/"
 images = os.listdir(path)
+print images
 
 for x in images:
 		a = cv2.imread(path + x)
