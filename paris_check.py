@@ -17,9 +17,12 @@ for x in images:
         			zeta = filter_check.satisfy(b,c)
         			if zeta < 150:
         				print "Superb"
+        				print x," and ",y
         			elif zeta < 200:
         				print "K"
+        				print x," and ",y
         			elif zeta < 250:
         				print "Meh"
+        				print x," and ",y
 
 print "Done"

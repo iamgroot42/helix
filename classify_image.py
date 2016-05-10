@@ -59,9 +59,9 @@ class NodeLookup(object):
                label_lookup_path=None,
                uid_lookup_path=None):
     if not label_lookup_path:
-      label_lookup_path = 'imagenet_2012_challenge_label_map_proto.pbtxt'
+      label_lookup_path = 'NN_Data/imagenet_2012_challenge_label_map_proto.pbtxt'
     if not uid_lookup_path:
-      uid_lookup_path = 'imagenet_synset_to_human_label_map.txt'
+      uid_lookup_path = 'NN_Data/imagenet_synset_to_human_label_map.txt'
     self.node_lookup = self.load(label_lookup_path, uid_lookup_path)
 
   def load(self, label_lookup_path, uid_lookup_path):
@@ -118,7 +118,7 @@ class NodeLookup(object):
 def create_graph():
   """Creates a graph from saved GraphDef file and returns a saver."""
   # Creates graph from saved graph_def.pb.
-  with tf.gfile.FastGFile('classify_image_graph_def.pb', 'rb') as f:
+  with tf.gfile.FastGFile('NN_Data/classify_image_graph_def.pb', 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
     _ = tf.import_graph_def(graph_def, name='')
