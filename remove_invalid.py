@@ -5,7 +5,6 @@ import imghdr
 
 
 def is_image_ok(fn):
-	print imghdr.what(fn)
 	if imghdr.what(fn) == 'jpeg':
 		return True
 	return False
@@ -13,7 +12,6 @@ def is_image_ok(fn):
 
 path = "Images/"
 images = os.listdir(path)
-print images
 
 for x in images:
 		a = cv2.imread(path + x)
