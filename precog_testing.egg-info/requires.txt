@@ -1,4 +1,0 @@
-pymongo
-numpy
-tweepy
-requests
