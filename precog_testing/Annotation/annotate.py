@@ -11,7 +11,7 @@ def push_to_db(path):
 	for img in os.listdir(path):
 		x = ce.run_inference_on_image(path + "/" + img,1)
 		(tag, confidence), = x.items()
-		table.insert_one( { "filename": img, "tag": tag, "confidence": str(confidence)} )
+		table.insert_one( { "filename": img, "tag": tag, "confidence": float(confidence)} )
 		print "..."
 
 	return True
