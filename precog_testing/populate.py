@@ -3,7 +3,7 @@ import requests
 import os
 
 
-def twitter(consumer_key, consumer_secret, access_token, access_token_secret, path):
+def download(consumer_key, consumer_secret, access_token, access_token_secret, path):
 	auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 	auth.set_access_token(access_token, access_token_secret)
 
