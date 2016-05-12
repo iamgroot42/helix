@@ -8,13 +8,11 @@ setup(name='precog_testing',
       author_email='anshuman14021@iiitd.ac.in',
       license='MIT',
       packages=find_packages(),
+      package_data={'precog_testing': ['NN_Data/*']},
       install_requires=[
           'pymongo',
-          'ImageChops',
-          'PIL',
           'numpy',
           'tweepy',
           'requests',
-          'os'
       ],
       zip_safe=False)
