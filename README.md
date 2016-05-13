@@ -39,10 +39,9 @@ import precog_testing.populate as p
 p.download("consumer_key", "consumer_secret", "access_token", "access_token_secret", "path/to/folder")
 ```
 
-### Annotation/annotate
+### classify_image
 ```python
-import cv2
-import precog_testing.Annotation.annotate as a
+import precog_testing.classify_image as c
 # Annotate images in given folder and push results into mongoDB (db:tensorflow_tags, table:tags)
-a.push_to_db("path/to/images")
+c.run_inference_on_images("path/to/images")
 ```

@@ -1,2 +1,4 @@
 *.pyc
-Images/*
+*.egg-info
+build/
+dist/

@@ -21,30 +21,21 @@
 Run image classification with Inception trained on ImageNet 2012 Challenge data
 set.
 
-This program creates a graph from a saved GraphDef protocol buffer,
-and runs inference on an input JPEG image. It outputs human readable
-strings of the top 5 predictions along with their probabilities.
-
-Change the --image_file argument to any jpg image to compute a
-classification of that image.
-
-Please see the tutorial and website for a detailed description of how
-to use this script to perform image recognition.
-
 https://tensorflow.org/tutorials/image_recognition/
 """
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
-import re
+from pymongo import MongoClient
 from os.path import abspath
 
+import re
+import os
 import numpy as np
 import tensorflow as tf
 
-path_to = abspath(__file__ + "/../..")
+path_to = abspath(__file__ + "/..")
 
 # classify_image_graph_def.pb:
 #   Binary representation of the GraphDef protocol buffer.
@@ -126,22 +117,23 @@ def create_graph():
     _ = tf.import_graph_def(graph_def, name='')
 
 
-def run_inference_on_image(image, num_top_predictions = 5):
-  """Runs inference on an image.
+def run_inference_on_images(path, num_top_predictions = 5):
+  """Runs inference on every image in given path.
 
   Args:
-    image: Image file name.
+    image: Path to directory containing images.
     num_top_predictions: Number of top predictions to be picked
 
   Returns:
-    A Dictionary of tags, along with confidence values
+    True, after all data has been pushed to DB
   """
-  if not tf.gfile.Exists(image):
-    tf.logging.fatal('File does not exist %s', image)
-  image_data = tf.gfile.FastGFile(image, 'rb').read()
-
   # Creates graph from saved GraphDef.
   create_graph()
+  
+  # Prepare mongoDB for storing tags.
+  client = MongoClient('mongodb://localhost:27017/')
+  db = client.tensorflow_tags
+  table = db.tags
 
   with tf.Session() as sess:
     # Some useful tensors:
@@ -153,20 +145,30 @@ def run_inference_on_image(image, num_top_predictions = 5):
     #   encoding of the image.
     # Runs the softmax tensor by feeding the image_data as input to the graph.
     softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
-    predictions = sess.run(softmax_tensor,
+
+    for image in os.listdir(path):
+      image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+
+      predictions = sess.run(softmax_tensor,
                            {'DecodeJpeg/contents:0': image_data})
-    predictions = np.squeeze(predictions)
+      predictions = np.squeeze(predictions)
+        # Creates node ID --> English string lookup.
+      node_lookup = NodeLookup()
 
-    # Creates node ID --> English string lookup.
-    node_lookup = NodeLookup()
+      top_k = predictions.argsort()[-num_top_predictions:][::-1]
 
-    top_k = predictions.argsort()[-num_top_predictions:][::-1]
+      tags = {}
 
-    tags = {}
+      for node_id in top_k:
+        human_string = node_lookup.id_to_string(node_id)
+        score = predictions[node_id]
+        tags[human_string] = score
 
-    for node_id in top_k:
-      human_string = node_lookup.id_to_string(node_id)
-      score = predictions[node_id]
-      tags[human_string] = score
+      # Highest confidence tag.
+      tag = sorted(tags,key=tags.get)[0]
+      confidence = tags[tag]
+      
+      # Push to DB.
+      table.insert_one( { "filename": image, "tag": tag, "confidence": float(confidence)} )
 
-    return tags
+    return True
