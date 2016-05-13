@@ -165,7 +165,7 @@ def run_inference_on_images(path, num_top_predictions = 5):
         tags[human_string] = score
 
       # Highest confidence tag.
-      tag = sorted(tags,key=tags.get)[0]
+      tag = sorted(tags,key=tags.get)[-1]
       confidence = tags[tag]
       
       # Push to DB.
