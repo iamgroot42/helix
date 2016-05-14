@@ -1,11 +1,18 @@
-from PIL import Image
-import os
+from PIL import Image,  ImageFile
 import ImageChops
+import os
 import imghdr
+import operator
+import math
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-def equal(imageA, imageB):
-    return ImageChops.difference(imageA, imageB).getbbox() is None
+def equal(A, B):
+    histA = A.histogram()
+    histB = B.histogram()
+    rms = math.sqrt(reduce(operator.add,
+    map(lambda a,b: (a-b)**2, histA, histB))/len(histA))
+    return (rms==0)
 
 
 def remove_duplicates(path):
@@ -13,13 +20,14 @@ def remove_duplicates(path):
     for x in images:
         for y in images:
             if x != y:
-                try:    
-                    a = Image.open(path + x)
-                    b = Image.open(path + y)
+                try:
+                    a = Image.open(path + "/" +x)
+                    b = Image.open(path + "/" + y)
+                    if equal(a,b):
+                        print "Deleting " + y
+                        os.remove(path + "/" + y)  
                 except:
                     continue
-            if equal(a,b):
-                os.remove(path + "/" + y)  
         images = os.listdir(path)
     return True
 
@@ -35,5 +43,5 @@ def delete_invalid(path):
     for x in images:
         if not is_image_ok(path + "/" + x):
             print "Deleting " + x
-            os.remove(path + x)
+            os.remove(path + "/" + x)
     return True
