@@ -25,12 +25,12 @@ def has_flag_filter(a, threshold = 4.5):
 		if max(L) >= 150:
 			indicator += 0.5
 	# All values should be close together (white/gray):
-	if max(M)-min(M) <= 40:
+	if max(M)-min(M) <= 70:
 		indicator +=1
 		# Higher value -> more white:
 		if min(M) >= 150:
 			indicator += 0.5
-	# return [L,M,R]
+	print indicator
 	if indicator >= threshold:
 		return True
 	else:

@@ -3,6 +3,7 @@
 ### Setting it up
 
 - Prerequisites : `tensorflow` and `opencv 3` 
+- `pip install Pillow --upgrade`
 - `sudo python setup.py install` to install the package
 
 
@@ -42,6 +43,6 @@ p.download("consumer_key", "consumer_secret", "access_token", "access_token_secr
 ### classify_image
 ```python
 import precog_testing.classify_image as c
-# Annotate images in given folder and push results into mongoDB (db:tensorflow_tags, table:tags)
-c.run_inference_on_images("path/to/images")
+# Annotate images in given folder and push results into mongoDB (db:analysis, table:tags)
+c.run_inference_on_images("path/to/images","path/to/json/generated/by/modified/densecap")
 ```
