@@ -6,7 +6,7 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client.analysis
 table = db.tags_with_spam
 
-path = os.path.expanduser("~/Desktop/Images5K")
+path = os.path.expanduser("~/Desktop/ImagesK")
 
 tbp = table.find()
 

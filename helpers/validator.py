@@ -7,7 +7,7 @@ db = client.analysis
 table = db.tags
 table2 = db.tags_with_spam
 
-path = os.path.expanduser("~/Desktop/Images5K")
+path = os.path.expanduser("~/Desktop/Images457")
 
 tbp = table.find()
 
@@ -18,6 +18,7 @@ for row in tbp:
 	img = Image.open(path + "/" + entry['filename'])
 	img.show()
 	# cv2.waitKey()
+	print entry['filename']
 	print "T: ",entry["tensorflow_tag"],"(",str(entry["tensorflow_confidence"]),")"
 	print "D: ",entry["densecap_tag"],"(",str(entry["densecap_confidence"]),")"
 	x,y,z = input()
