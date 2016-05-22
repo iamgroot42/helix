@@ -1,4 +1,4 @@
-from PIL import Image,  ImageFile
+from PIL import Image, ImageFile
 import ImageChops
 import os
 import imghdr
