@@ -28,7 +28,9 @@ from __future__ import division
 from __future__ import print_function
 from pymongo import MongoClient
 from os.path import abspath
+from skimage import io
 
+import dlib
 import re
 import os
 import json
@@ -152,8 +154,12 @@ def run_inference_on_images(path, densecap_json = None, num_top_predictions = 3,
     # Runs the softmax tensor by feeding the image_data as input to the graph.
     softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
 
+    # Create face detector instance
+    detector = dlib.get_frontal_face_detector()
+
     for image in os.listdir(path):
       image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      img_p = io.imread(path + "/" + image)
 
       predictions = sess.run(softmax_tensor,
                            {'DecodeJpeg/contents:0': image_data})
@@ -182,8 +188,13 @@ def run_inference_on_images(path, densecap_json = None, num_top_predictions = 3,
       	d_tag = data[image]["captions"]
       	d_score = data[image]["scores"]
 
+      # Number of people
+      dets = detector(img_p, 1) # Second argument is upscale factor (for better detection)
+
       # Push to DB.
       table.insert_one( { "filename": image, "tensorflow_tag": tag, "tensorflow_confidence": confidence,
-      	"densecap_tag": d_tag, "densecap_confidence": float(d_score)} )
+        # Uncomment to include densecap results:
+        # "densecap_tag": d_tag, "densecap_confidence": float(d_score),
+      	"faces": len(dets)} )
 
     return True
