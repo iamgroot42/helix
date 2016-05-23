@@ -8,6 +8,8 @@ import math
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def equal(A, B):
+    A = A.convert('RGB')
+    B = B.convert('RGB')
     histA = A.histogram()
     histB = B.histogram()
     rms = math.sqrt(reduce(operator.add,
