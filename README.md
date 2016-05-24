@@ -44,5 +44,5 @@ p.download("consumer_key", "consumer_secret", "access_token", "access_token_secr
 ```python
 import precog_testing.classify_image as c
 # Annotate images in given folder and push results into mongoDB (db:analysis, table:tags)
-c.run_inference_on_images("path/to/images","path/to/json/generated/by/modified/densecap")
+c.run_inference_on_images("path/to/images",database_name","collection_name")
 ```
