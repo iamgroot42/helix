@@ -86,22 +86,22 @@ for x in a:
 			file.write("Third in one tag : "+po3+", percentage : "+ str(100*(one[po1]/float(count))) +"\n")
 		except:
 			pass
-		file.write("First in two tag : "+ta1+", percentage : "+ str(100*(two[ta1]/float(2*count))) +"\n")
+		file.write("First in two tag : "+ta1+", percentage : "+ str(100*(two[ta1]/float(count))) +"\n")
 		try:
-			file.write("Second in two tag : "+ta2+", percentage : "+ str(100*(two[ta2]/float(2*count))) +"\n")
+			file.write("Second in two tag : "+ta2+", percentage : "+ str(100*(two[ta2]/float(count))) +"\n")
 		except:
 			pass
 		try:
-			file.write("Third in two tag : "+ta3+", percentage : "+ str(100*(two[ta3]/float(2*count))) +"\n")
+			file.write("Third in two tag : "+ta3+", percentage : "+ str(100*(two[ta3]/float(count))) +"\n")
 		except:
 			pass
-		file.write("First in three tag : "+to1+", percentage : "+ str(100*(three[to1]/float(3*count))) +"\n")
+		file.write("First in three tag : "+to1+", percentage : "+ str(100*(three[to1]/float(count))) +"\n")
 		try:
-			file.write("Second in three tag : "+to2+", percentage : "+ str(100*(three[to2]/float(3*count))) +"\n")
+			file.write("Second in three tag : "+to2+", percentage : "+ str(100*(three[to2]/float(count))) +"\n")
 		except:
 			pass
 		try:
-			file.write("Third in three tag : "+to3+", percentage : "+ str(100*(three[to3]/float(3*count))) +"\n")
+			file.write("Third in three tag : "+to3+", percentage : "+ str(100*(three[to3]/float(count))) +"\n")
 		except:
 			pass
 		file.write("\n")

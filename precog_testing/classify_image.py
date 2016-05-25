@@ -30,6 +30,7 @@ from skimage import io
 from multiprocessing import Process
 
 import dlib
+import exifread
 import re
 import os
 import json
@@ -181,6 +182,13 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
 
     for image in os.listdir(path):
       image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      img_exif = open(path + "/" + image)
+      exif = exifread.process_file(img_exif)
+
+    # Convert byte array to unicode (exif)
+    for k in ['Image XPTitle', 'Image XPComment', 'Image XPAuthor', 'Image XPKeywords', 'Image XPSubject']:
+      if k in exif:
+        exif[k].values = u"".join(map(unichr, exif[k].values)).decode('utf-16')
 
       predictions = sess.run(final_tensor,
                            {'DecodeJpeg/contents:0': image_data})
@@ -202,8 +210,17 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
       confidence = float(tags[tag])
       # confidence = [ float(tags[c]) for c in tag]
 
+      # EXIF data
+      exif_data = { 'Image Make':"", 'Image Model':"", 'EXIF DateTimeOriginal':"" }
+      attrs = ['Image Make', 'Image Model', 'EXIF DateTimeOriginal']
+      for at in attrs:
+        if at in exif:
+          exif_data[at] = exif[at].values
+
       # Push to DB
-      table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence} )
+      table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence, 
+        "camera_make": exif_data['Image Make'], "camera_model": exif_data['Image Model'],
+        "capture_date": exif_data['EXIF DateTimeOriginal'] } )
 
     return True
 
