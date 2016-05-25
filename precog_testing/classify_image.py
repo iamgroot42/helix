@@ -185,42 +185,42 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
       img_exif = open(path + "/" + image)
       exif = exifread.process_file(img_exif)
 
-    # Convert byte array to unicode (exif)
-    for k in ['Image XPTitle', 'Image XPComment', 'Image XPAuthor', 'Image XPKeywords', 'Image XPSubject']:
-      if k in exif:
-        exif[k].values = u"".join(map(unichr, exif[k].values)).decode('utf-16')
+      # Convert byte array to unicode (exif)
+      for k in ['Image XPTitle', 'Image XPComment', 'Image XPAuthor', 'Image XPKeywords', 'Image XPSubject']:
+        if k in exif:
+          exif[k].values = u"".join(map(unichr, exif[k].values)).decode('utf-16')
 
-      predictions = sess.run(final_tensor,
-                           {'DecodeJpeg/contents:0': image_data})
-      predictions = np.squeeze(predictions)
-        # Creates node ID --> English string lookup.
-      node_lookup = CustomLookup()
+        predictions = sess.run(final_tensor,
+                             {'DecodeJpeg/contents:0': image_data})
+        predictions = np.squeeze(predictions)
+          # Creates node ID --> English string lookup.
+        node_lookup = CustomLookup()
 
-      top_k = predictions.argsort()[-num_top_predictions:][::-1]
+        top_k = predictions.argsort()[-num_top_predictions:][::-1]
 
-      tags = {}
+        tags = {}
 
-      for node_id in top_k:
-        human_string = node_lookup.id_to_string(node_id)
-        score = predictions[node_id]
-        tags[human_string] = score
+        for node_id in top_k:
+          human_string = node_lookup.id_to_string(node_id)
+          score = predictions[node_id]
+          tags[human_string] = score
 
-      # Picking top confidence value.
-      tag = sorted(tags, key = tags.get, reverse = True)[0]
-      confidence = float(tags[tag])
-      # confidence = [ float(tags[c]) for c in tag]
+        # Picking top confidence value.
+        tag = sorted(tags, key = tags.get, reverse = True)[0]
+        confidence = float(tags[tag])
+        # confidence = [ float(tags[c]) for c in tag]
 
-      # EXIF data
-      exif_data = { 'Image Make':"", 'Image Model':"", 'EXIF DateTimeOriginal':"" }
-      attrs = ['Image Make', 'Image Model', 'EXIF DateTimeOriginal']
-      for at in attrs:
-        if at in exif:
-          exif_data[at] = exif[at].values
+        # EXIF data
+        exif_data = { 'Image Make':"", 'Image Model':"", 'EXIF DateTimeOriginal':"" }
+        attrs = ['Image Make', 'Image Model', 'EXIF DateTimeOriginal']
+        for at in attrs:
+          if at in exif:
+            exif_data[at] = exif[at].values
 
-      # Push to DB
-      table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence, 
-        "camera_make": exif_data['Image Make'], "camera_model": exif_data['Image Model'],
-        "capture_date": exif_data['EXIF DateTimeOriginal'] } )
+        # Push to DB
+        table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence, 
+          "camera_make": exif_data['Image Make'], "camera_model": exif_data['Image Model'],
+          "capture_date": exif_data['EXIF DateTimeOriginal'] } )
 
     return True
 
@@ -352,15 +352,18 @@ def run_inference_on_images(path, db_name, collection_name, num_top_predictions 
     for y in x.keys():
       shared_data[fname][y] = x[y]
 
-    if exists:
-      left_table.drop()
-      right_table.drop()
-    else:
-      client.drop_database("temporary_storage")
+
+  if exists:
+    left_table.drop()
+    right_table.drop()
+  else:
+    client.drop_database("temporary_storage")
 
   db = client[db_name]
   table = db[collection_name]
+
   for x in shared_data.keys():
+    shared_data[x]['filename'] = x
     table.insert_one(shared_data[x])
 
   return True
