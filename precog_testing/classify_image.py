@@ -16,7 +16,6 @@
 
 # Modified by : iamgroot42
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -348,6 +347,3 @@ def run_inference_on_images(path, db_name, collection_name, num_top_predictions 
     table.insert_one(shared_data[x])
 
   return True
-
-if __name__ == "__main__":
-  run_inference_on_images("/home/anshuman/Desktop/Images","alooo","kachaloo")
