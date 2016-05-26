@@ -156,7 +156,7 @@ def create_custom_graph():
     _ = tf.import_graph_def(graph_def, name='')
 
 
-def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
+def custom_inference(images, path, db_name, collection_name, num_top_predictions = 3):
   """Runs inference on every image in given path.
 
   Args:
@@ -180,7 +180,7 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
 
     final_tensor = sess.graph.get_tensor_by_name('final_result:0')
 
-    for image in os.listdir(path):
+    for image in images:
       image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
       img_exif = open(path + "/" + image)
       exif = exifread.process_file(img_exif)
@@ -230,7 +230,7 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
     return True
 
 
-def tensor_inference(path, db_name, collection_name, num_top_predictions = 3):
+def tensor_inference(images, path, db_name, collection_name, num_top_predictions = 3):
   """Runs inference on every image in given path.
 
   Args:
@@ -256,7 +256,7 @@ def tensor_inference(path, db_name, collection_name, num_top_predictions = 3):
     # Create face detector instance
     detector = dlib.get_frontal_face_detector()
 
-    for image in os.listdir(path):
+    for image in images:
       image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
       img_p = io.imread(path + "/" + image)
       predictions = None
@@ -331,8 +331,13 @@ def run_inference_on_images(path, db_name, collection_name, num_top_predictions 
     right += str(i)
 
   jobs = []
-  jobs.append(Process(target = tensor_inference, args=(path,"temporary_storage",left,)))
-  jobs.append(Process(target = custom_inference, args=(path,"temporary_storage",right,)))
+  images = os.listdir(path)
+  even = images[0::2]
+  odd = images[1::2]
+  jobs.append(Process(target = tensor_inference, args=(odd, path,"temporary_storage",left,)))
+  jobs.append(Process(target = tensor_inference, args=(even, path,"temporary_storage",left,)))
+  jobs.append(Process(target = custom_inference, args=(odd, path,"temporary_storage",right,)))
+  jobs.append(Process(target = custom_inference, args=(even, path,"temporary_storage",right,)))
 
   for j in jobs:
     j.start()
