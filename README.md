@@ -17,8 +17,6 @@ b = Image.open("path/to/image")
 c.equal(a,b)
 # Remove all duplicate images from folder
 c.remove_duplicates("path/to/images")
-# Check if an image is in valid .jpeg format (not corrupt)
-c.is_image_ok("path/to/file")
 # Delete all invalid .jpeg images from folder
 c.delete_invalid("path/to/images")
 ```

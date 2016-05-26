@@ -8,6 +8,10 @@ import math
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def equal(A, B):
+    widtha, heighta = A.size
+    widthb, heightb = B.size
+    if widtha != widthb or heighta != heightb:
+        return False
     A = A.convert('RGB')
     B = B.convert('RGB')
     histA = A.histogram()
@@ -25,25 +29,27 @@ def remove_duplicates(path):
                 try:
                     a = Image.open(path + "/" +x)
                     b = Image.open(path + "/" + y)
-                    if equal(a,b):
-                        print "Deleting " + y
-                        os.remove(path + "/" + y)  
+                    fsizea = os.path.getsize(path + "/" +x) 
+                    fsizeb = os.path.getsize(path + "/" +y) 
+                    if fsizea == fsizeb:
+                        if equal(a,b):
+                            print "Deleting " + y
+                            os.remove(path + "/" + y)  
                 except:
                     continue
         images = os.listdir(path)
     return True
 
 
-def is_image_ok(fn):
-    if imghdr.what(fn) == 'jpeg':
-        return True
-    return False
-
-
 def delete_invalid(path):
     images = os.listdir(path)
     for x in images:
-        if not is_image_ok(path + "/" + x):
-            print "Deleting " + x
-            os.remove(path + "/" + x)
+        paath = path + "/" + x
+        try:
+            img = Image.open(paath)
+            z = img.format
+            if z != 'JPEG' and z !='PNG':
+                os.remove(paath) 
+        except:
+            os.remove(paath)  
     return True
