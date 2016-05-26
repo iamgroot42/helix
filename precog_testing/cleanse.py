@@ -23,7 +23,11 @@ def equal(A, B):
 
 def remove_duplicates(path):
     images = os.listdir(path)
+    i = 0
     for x in images:
+        i += 100
+        base = float(len(images))
+        print (i/base),"%","completed"
         for y in images:
             if x != y:
                 try:

@@ -189,42 +189,43 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
       for k in ['Image XPTitle', 'Image XPComment', 'Image XPAuthor', 'Image XPKeywords', 'Image XPSubject']:
         if k in exif:
           exif[k].values = u"".join(map(unichr, exif[k].values)).decode('utf-16')
-        predictions = None
-        try:
-          predictions = sess.run(final_tensor,
-                               {'DecodeJpeg/contents:0': image_data})
-        except:
-          print(image)
-          continue
-        predictions = np.squeeze(predictions)
-          # Creates node ID --> English string lookup.
-        node_lookup = CustomLookup()
+          
+      predictions = None
+      try:
+        predictions = sess.run(final_tensor,
+                             {'DecodeJpeg/contents:0': image_data})
+      except:
+        print(image)
+        continue
+      predictions = np.squeeze(predictions)
+        # Creates node ID --> English string lookup.
+      node_lookup = CustomLookup()
 
-        top_k = predictions.argsort()[-num_top_predictions:][::-1]
+      top_k = predictions.argsort()[-num_top_predictions:][::-1]
 
-        tags = {}
+      tags = {}
 
-        for node_id in top_k:
-          human_string = node_lookup.id_to_string(node_id)
-          score = predictions[node_id]
-          tags[human_string] = score
+      for node_id in top_k:
+        human_string = node_lookup.id_to_string(node_id)
+        score = predictions[node_id]
+        tags[human_string] = score
 
-        # Picking top confidence value.
-        tag = sorted(tags, key = tags.get, reverse = True)[0]
-        confidence = float(tags[tag])
-        # confidence = [ float(tags[c]) for c in tag]
+      # Picking top confidence value.
+      tag = sorted(tags, key = tags.get, reverse = True)[0]
+      confidence = float(tags[tag])
+      # confidence = [ float(tags[c]) for c in tag]
 
-        # EXIF data
-        exif_data = { 'Image Make':"", 'Image Model':"", 'EXIF DateTimeOriginal':"" }
-        attrs = ['Image Make', 'Image Model', 'EXIF DateTimeOriginal']
-        for at in attrs:
-          if at in exif:
-            exif_data[at] = exif[at].values
+      # EXIF data
+      exif_data = { 'Image Make':"", 'Image Model':"", 'EXIF DateTimeOriginal':"" }
+      attrs = ['Image Make', 'Image Model', 'EXIF DateTimeOriginal']
+      for at in attrs:
+        if at in exif:
+          exif_data[at] = exif[at].values
 
-        # Push to DB
-        table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence, 
-          "camera_make": exif_data['Image Make'], "camera_model": exif_data['Image Model'],
-          "capture_date": exif_data['EXIF DateTimeOriginal'] } )
+      # Push to DB
+      table.insert_one( { "filename": image, "custom_tag": tag, "custom_confidence": confidence, 
+        "camera_make": exif_data['Image Make'], "camera_model": exif_data['Image Model'],
+        "capture_date": exif_data['EXIF DateTimeOriginal'] } )
 
     return True
 
