@@ -181,7 +181,12 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
     final_tensor = sess.graph.get_tensor_by_name('final_result:0')
 
     for image in os.listdir(path):
-      image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      image_data = None
+      try:
+        image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      except:
+        print image
+        continue
       img_exif = open(path + "/" + image)
       exif = exifread.process_file(img_exif)
 
@@ -252,7 +257,12 @@ def tensor_inference(path, db_name, collection_name, num_top_predictions = 3):
     detector = dlib.get_frontal_face_detector()
 
     for image in os.listdir(path):
-      image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      image_data = None
+      try:
+        image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      except:
+        print image
+        continue
       img_p = io.imread(path + "/" + image)
 
       predictions = sess.run(softmax_tensor,
