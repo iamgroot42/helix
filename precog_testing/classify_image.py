@@ -181,12 +181,7 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
     final_tensor = sess.graph.get_tensor_by_name('final_result:0')
 
     for image in os.listdir(path):
-      image_data = None
-      try:
-        image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
-      except:
-        print(image)
-        continue
+      image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
       img_exif = open(path + "/" + image)
       exif = exifread.process_file(img_exif)
 
@@ -194,9 +189,13 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
       for k in ['Image XPTitle', 'Image XPComment', 'Image XPAuthor', 'Image XPKeywords', 'Image XPSubject']:
         if k in exif:
           exif[k].values = u"".join(map(unichr, exif[k].values)).decode('utf-16')
-
-        predictions = sess.run(final_tensor,
-                             {'DecodeJpeg/contents:0': image_data})
+        predictions = None
+        try:
+          predictions = sess.run(final_tensor,
+                               {'DecodeJpeg/contents:0': image_data})
+        except:
+          print(image)
+          continue
         predictions = np.squeeze(predictions)
           # Creates node ID --> English string lookup.
         node_lookup = CustomLookup()
@@ -257,16 +256,15 @@ def tensor_inference(path, db_name, collection_name, num_top_predictions = 3):
     detector = dlib.get_frontal_face_detector()
 
     for image in os.listdir(path):
-      image_data = None
+      image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+      img_p = io.imread(path + "/" + image)
+      predictions = None
       try:
-        image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
+        predictions = sess.run(softmax_tensor,
+                            {'DecodeJpeg/contents:0': image_data})
       except:
         print(image)
         continue
-      img_p = io.imread(path + "/" + image)
-
-      predictions = sess.run(softmax_tensor,
-                           {'DecodeJpeg/contents:0': image_data})
       predictions = np.squeeze(predictions)
         # Creates node ID --> English string lookup.
       node_lookup = TensorLookup()
