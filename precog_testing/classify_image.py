@@ -185,7 +185,7 @@ def custom_inference(path, db_name, collection_name, num_top_predictions = 3):
       try:
         image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
       except:
-        print image
+        print(image)
         continue
       img_exif = open(path + "/" + image)
       exif = exifread.process_file(img_exif)
@@ -261,7 +261,7 @@ def tensor_inference(path, db_name, collection_name, num_top_predictions = 3):
       try:
         image_data = tf.gfile.FastGFile(path + "/" + image, 'rb').read()
       except:
-        print image
+        print(image)
         continue
       img_p = io.imread(path + "/" + image)
 
