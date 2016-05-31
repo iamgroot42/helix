@@ -2,6 +2,7 @@ from PIL import Image, ImageFile
 import ImageChops
 import os
 import imghdr
+import sys
 import operator
 import math
 
@@ -27,7 +28,7 @@ def remove_duplicates(path):
     for x in images:
         i += 100
         base = float(len(images))
-        print (i/base),"%","completed"
+        counter = 0
         for y in images:
             if x != y:
                 try:
@@ -37,8 +38,10 @@ def remove_duplicates(path):
                     fsizeb = os.path.getsize(path + "/" +y) 
                     if fsizea == fsizeb:
                         if equal(a,b):
-                            print "Deleting " + y
-                            os.remove(path + "/" + y)  
+                            counter += 1
+                            if counter > 1:
+                                print "Deleting",y
+                                os.remove(path + "/" + y)   
                 except:
                     continue
         images = os.listdir(path)
@@ -62,3 +65,9 @@ def delete_invalid(path):
         except:
             os.remove(paath)  
     return True
+
+
+if __name__ == "__main__":
+    path = os.path.expanduser(sys.argv[1])
+    delete_invalid(path)
+    remove_duplicates(path)
