@@ -10,48 +10,55 @@ import time
 from requests.packages import urllib3
 urllib3.disable_warnings()
 
-# Confosn token: never expires
-TOKEN = 'CAAHKAhIiZA9UBAEEbihPGG5kCgd66GUgHYxlGPDz5YFBgCOoE9nLIsZA7rmmwt31R7bI89ppnZBzBdG0gNO8zikyfcqnIQkSZA8aVK9KZBKrUDNg7IeBVZC1tOq9uj6QrHQE0rQMrs8osZBWZAzScx3WywjS8XZCCY1tKUU8NshIZClanNH6cLZAEItzLt7aGSrr7oZD'
-LIMIT = 300
+# iOS Messenger token
+TOKEN = 'EAADYPcrzZBmcBAApxLbVmdOadj0zkWIZBIBZAjwMTVZCxPqv00yhJYinou3CmsLZAISkoTctrDNdb0GLjl3YK5d712W31chUCyWtOCw5rbbbvgbYXZAVk6MSNNXwzSd5P2ZBTgouiZBuoq90JWDZCrgIuwJA4QTJjEdbVTdexg519tAZDZD'
+LIMIT = 1000
 
 
 def stalk(fb_id):
 	client = MongoClient()
 	db = client['fb_analysis']
-	url = 'https://graph.facebook.com/v2.0/' + str(fb_id) + '/' + 'sharedposts?limit=' + str(LIMIT) + '&access_token=' + TOKEN
+	url = 'https://graph.facebook.com/v2.0/' + str(fb_id) + '/' + 'sharedposts?fields=from&limit=' + str(LIMIT) + '&access_token=' + TOKEN
 	resp = json.loads(requests.get(url).text) 
 	mine = db[str(fb_id)]
 	count = 0
 	while resp is not None and count < 50000:
-			if 'error' in resp:
-				if resp['error']['code'] == 100:
-					break
-
-			if 'data' not in resp:
-				if 'error' in resp:
-					if resp['error']['code'] == 12:
-						break
-				time.sleep(180)
-				resp = json.loads(requests.get(url).text)
-				continue
-
-			if len(resp['data']) == 0:
+		if 'error' in resp:
+			if resp['error']['code'] == 100:
 				break
 
-			for i in resp['data']:
+		if 'data' not in resp:
+			if 'error' in resp:
+				if resp['error']['code'] == 12:
+					break
+			time.sleep(180)
+			resp = json.loads(requests.get(url).text)
+			continue
+
+		if len(resp['data']) == 0:
+			print "damn,son"
+			break
+
+		print len(resp['data'])
+
+		for i in resp['data']:
+			try:
 				uid = i['from']['id']
 				mine.insert_one({"ID" : uid})
 				count += 1
+			except:
+				continue
 
-			if 'paging' in resp:
-				if 'next' in resp['paging']:
-					url = resp['paging']['next']
-					resp = json.loads(requests.get(url).text)
-				else:
-					resp = None
+		if 'paging' in resp:
+			if 'next' in resp['paging']:
+				url = resp['paging']['next']
+				resp = json.loads(requests.get(url).text)
 			else:
-				resp = None	
-	print "Done with",fb_id
+				resp = None
+		else:
+			resp = None	
+
+	print "Done with",fb_id,":",count
 
 
 def get_shares():
