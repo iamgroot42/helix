@@ -29,7 +29,7 @@ def visual_result_link(filepath):
 def list_it(src,dest,scraper_path):
 	images = os.listdir(src)
 	for x in images:
-		path = dest + x.split('.')[0]
+		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
 		argument = visual_result_link(src + x)
 		argument = argument.replace('&','\&')
