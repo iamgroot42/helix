@@ -1,15 +1,13 @@
 var Scraper = require ('reverse-images-scraper')
   , google = new Scraper.Google();
 
-var myArgs = process.argv.slice(2);
-
-var url = myArgs[0]
+var ur_el = process.argv[2];
 
 google.list({
     nightmare: {
         show: false
     },
-    url:url
+    url: ur_el
 })
 .then(function (res) {
 	for(x of res)

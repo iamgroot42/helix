@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import os
 import requests
+import subprocess
+import sys
 
 
 def visual_result_link(filepath):
@@ -11,8 +13,8 @@ def visual_result_link(filepath):
 	response = s.post(searchUrl, files = multipart, allow_redirects=False)
 	fetchUrl = response.headers['Location']
 
-	headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) \
-				AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)\
+				Chrome/41.0.2228.0 Safari/537.36'}
 
 	req = s.get(fetchUrl, headers = headers)
 
@@ -24,5 +26,22 @@ def visual_result_link(filepath):
 	return "http://google.com" + zelda
 
 
+def list_it(src,dest,scraper_path):
+	images = os.listdir(src)
+	for x in images:
+		path = dest + x.split('.')[0]
+		os.mkdir(path)
+		argument = visual_result_link(src + x)
+		argument = argument.replace('&','\&')
+		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
+		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
+		print command
+		os.system(command)
+		print "Fetched for",x
+
+
 if __name__ == "__main__":
-	print visual_result_link('doge.jpeg')
+	src = os.path.expanduser(sys.argv[1])
+	dest = os.path.expanduser(sys.argv[2])
+	scraper_path = os.path.expanduser(sys.argv[3])
+	list_it(src,dest,scraper_path)
