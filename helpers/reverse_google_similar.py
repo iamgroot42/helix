@@ -35,9 +35,8 @@ def list_it(src,dest,scraper_path):
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
-		print command
 		os.system(command)
-		print "Fetched for",x
+		print "Fetchedr"
 
 
 if __name__ == "__main__":
