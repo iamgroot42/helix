@@ -1,12 +1,15 @@
-var Scraper = require ('images-scraper')
+var Scraper = require ('reverse-images-scraper')
   , google = new Scraper.Google();
 
+var myArgs = process.argv.slice(2);
+
+var url = myArgs[0]
+
 google.list({
-    keyword: 'Colosseum',
-    detail: true,
     nightmare: {
         show: false
-    }
+    },
+    url:url
 })
 .then(function (res) {
 	for(x of res)
