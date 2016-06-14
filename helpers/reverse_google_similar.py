@@ -13,7 +13,7 @@ def visual_result_link(filepath):
 	s = requests.Session()
 	response = s.post(searchUrl, files = multipart, allow_redirects=False)
 	# Google may block
-	time.sleep(3)
+	time.sleep(2)
 	fetchUrl = response.headers['Location']
 
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -31,7 +31,8 @@ def visual_result_link(filepath):
 		return None
 
 
-def list_it(src,dest,scraper_path,images):
+def list_it(src,dest,scraper_path):
+	images = os.listdir(src)
 	for x in images:
 		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
@@ -43,26 +44,11 @@ def list_it(src,dest,scraper_path,images):
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
 		os.system(command)
-		time.sleep(3)
+		time.sleep(2)
 
 
 if __name__ == "__main__":
 	src = os.path.expanduser(sys.argv[1])
 	dest = os.path.expanduser(sys.argv[2])
 	scraper_path = os.path.expanduser(sys.argv[3])
-
-	ncores = 10
-	jobs = []
-	images = os.listdir(src)
-	csize = len(images)/ncores
-	for i in range(0, len(images), csize):
-		chunk = images[i:i + csize]
-		jobs.append(Process(target = list_it, args=(src,dest,scraper_path,chunk)))
-
-	for j in jobs:
-		j.start()
-
-	for j in jobs:
-		j.join()
-
-	print "Done"
+	list_it(stc,dest,scraper_path)
