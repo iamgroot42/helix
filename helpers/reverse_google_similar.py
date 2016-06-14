@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import time
 import os
 import requests
 import subprocess
@@ -9,9 +10,10 @@ from multiprocessing import Process
 def visual_result_link(filepath):
 	searchUrl = 'http://www.google.com/searchbyimage/upload'
 	multipart = {'encoded_image': (filepath, open(filepath, 'rb')), 'image_content': ''}
-
 	s = requests.Session()
 	response = s.post(searchUrl, files = multipart, allow_redirects=False)
+	# Google may block
+	time.sleep(3)
 	fetchUrl = response.headers['Location']
 
 	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)\
@@ -35,13 +37,13 @@ def list_it(src,dest,scraper_path,images):
 		os.mkdir(path)
 		argument = visual_result_link(src + x)
 		if argument is None:
-			print "Error with ",x
+			print x
 			continue
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
 		os.system(command)
-		print "Fetched"
+		time.sleep(3)
 
 
 if __name__ == "__main__":
