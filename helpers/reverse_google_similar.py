@@ -23,8 +23,10 @@ def visual_result_link(filepath):
 
 	for link in soup.findAll('a', href=True, text='Visually similar images'):
 		zelda = link['href']
-
-	return "http://google.com" + zelda
+	try:
+		return "http://google.com" + zelda
+	except:
+		return None
 
 
 def list_it(src,dest,scraper_path,images):
@@ -32,6 +34,9 @@ def list_it(src,dest,scraper_path,images):
 		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
 		argument = visual_result_link(src + x)
+		if argument is None:
+			print "Error with ",x
+			continue
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
