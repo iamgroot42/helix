@@ -7,7 +7,8 @@ google.list({
     nightmare: {
         show: false
     },
-    url: ur_el
+    url: ur_el,
+    num: 30
 })
 .then(function (res) {
 	for(x of res)
