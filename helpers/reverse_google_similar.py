@@ -12,12 +12,10 @@ def visual_result_link(filepath):
 	multipart = {'encoded_image': (filepath, open(filepath, 'rb')), 'image_content': ''}
 	s = requests.Session()
 	response = s.post(searchUrl, files = multipart, allow_redirects=False)
-	# Google may block
-	time.sleep(2)
 	fetchUrl = response.headers['Location']
 
-	headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko)\
-				Chrome/41.0.2228.0 Safari/537.36'}
+	headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1)\
+				AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 	req = s.get(fetchUrl, headers = headers)
 
@@ -44,11 +42,11 @@ def list_it(src,dest,scraper_path):
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
 		os.system(command)
-		time.sleep(2)
+		print "got"
 
 
 if __name__ == "__main__":
 	src = os.path.expanduser(sys.argv[1])
 	dest = os.path.expanduser(sys.argv[2])
 	scraper_path = os.path.expanduser(sys.argv[3])
-	list_it(stc,dest,scraper_path)
+	list_it(src,dest,scraper_path)
