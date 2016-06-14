@@ -3,6 +3,7 @@ import os
 import requests
 import subprocess
 import sys
+from multiprocessing import Process
 
 
 def visual_result_link(filepath):
@@ -26,8 +27,7 @@ def visual_result_link(filepath):
 	return "http://google.com" + zelda
 
 
-def list_it(src,dest,scraper_path):
-	images = os.listdir(src)
+def list_it(src,dest,scraper_path,images):
 	for x in images:
 		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
@@ -43,4 +43,19 @@ if __name__ == "__main__":
 	src = os.path.expanduser(sys.argv[1])
 	dest = os.path.expanduser(sys.argv[2])
 	scraper_path = os.path.expanduser(sys.argv[3])
-	list_it(src,dest,scraper_path)
+
+	ncores = 10
+	jobs = []
+	images = os.listdir(src)
+	csize = len(images)/ncores
+	for i in range(0, len(images), csize):
+		chunk = images[i:i + csize]
+		jobs.append(Process(target = list_it, args=(src,dest,scraper_path,chunk)))
+
+	for j in jobs:
+		j.start()
+
+	for j in jobs:
+		j.join()
+
+	print "Done"
