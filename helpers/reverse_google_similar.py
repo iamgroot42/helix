@@ -20,27 +20,33 @@ def visual_result_link(filepath):
 	req = s.get(fetchUrl, headers = headers)
 
 	soup = BeautifulSoup(req.text.encode('utf-8'), "lxml")
-
+	zelda = None
 	for link in soup.findAll('a', href=True, text='Visually similar images'):
-		zelda = link['href']
-	try:
-		return "http://google.com" + zelda
-	except:
-		return None
+		zelda = "http://google.com" + link['href']
+		break
+
+	return zelda
 
 
 def list_it(src,dest,scraper_path):
 	images = os.listdir(src)
 	i = 1
+	prev_sleep = False
 	for x in images:
 		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
 		argument = visual_result_link(src + x)
+
 		if argument is None:
-			print x
-		else:
-			print "Blocked!"
-			exit()
+			if prev_sleep:
+				print "Nope"
+				exit()
+			print "Blocked, sleeping for 10 minutes"
+			time.sleep(600)
+			prev_sleep = True
+			continue
+
+		prev_sleep = False
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
@@ -48,9 +54,6 @@ def list_it(src,dest,scraper_path):
 		os.remove(src + x)
 		print str(i)
 		i += 1
-		if (i%100==0):
-			# Sleep for 10 minutes after every 100 images
-			time.sleep(600)
 
 
 if __name__ == "__main__":
