@@ -31,18 +31,26 @@ def visual_result_link(filepath):
 
 def list_it(src,dest,scraper_path):
 	images = os.listdir(src)
+	i = 1
 	for x in images:
 		path = dest + '.'.join(x.split('.')[:-1])
 		os.mkdir(path)
 		argument = visual_result_link(src + x)
 		if argument is None:
 			print x
-			continue
+		else:
+			print "Blocked!"
+			exit()
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
 		os.system(command)
-		print "got"
+		os.remove(src + x)
+		print str(i)
+		i += 1
+		if (i%100==0):
+			# Sleep for 10 minutes after every 100 images
+			time.sleep(600)
 
 
 if __name__ == "__main__":
