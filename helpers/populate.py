@@ -5,7 +5,7 @@ import json
 
 client = MongoClient('mongodb://localhost:27017/')
 db = client.analysis
-table = db.tags_with_spam_2
+table = db.data_team_2x
 
 path = os.path.expanduser("~/Desktop/")
 

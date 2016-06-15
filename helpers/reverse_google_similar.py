@@ -18,35 +18,27 @@ def visual_result_link(filepath):
 				AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 	req = s.get(fetchUrl, headers = headers)
-
 	soup = BeautifulSoup(req.text.encode('utf-8'), "lxml")
 	zelda = None
 	for link in soup.findAll('a', href=True, text='Visually similar images'):
 		zelda = "http://google.com" + link['href']
 		break
-
 	return zelda
 
 
 def list_it(src,dest,scraper_path):
 	images = os.listdir(src)
 	i = 1
-	prev_sleep = False
 	for x in images:
 		path = dest + '.'.join(x.split('.')[:-1])
-		os.mkdir(path)
 		argument = visual_result_link(src + x)
-
+		print x
 		if argument is None:
-			if prev_sleep:
-				print "Nope"
-				exit()
-			print "Blocked, sleeping for 10 minutes"
-			time.sleep(600)
-			prev_sleep = True
+			print "Blocked, sleeping for 5 minutes"
+			time.sleep(300)
 			continue
 
-		prev_sleep = False
+		os.mkdir(path)
 		argument = argument.replace('&','\&')
 		path = path.replace(' ','\ ').replace(')','\)').replace('(','\(')
 		command = "node " + scraper_path + " " + argument + " > "  + path + "/names"
