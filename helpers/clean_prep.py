@@ -1,5 +1,5 @@
 from PIL import Image
-from precog_testing import cleanse
+# from precog_testing import cleanse
 import os
 import sys
 
@@ -43,26 +43,26 @@ for c in x:
 print "Deleted GIF/other images"
 
 
-# Delete duplicates based on object-IDs
-dictio = {}
-x = os.listdir(dirr)
-print "Left with ",len(x)
-for c in x:
-	paath = os.path.expanduser(dirr + "/" + c)
-	dictio[c.split('__')[0]] = c
-for c in x:
-	paath = os.path.expanduser(dirr + "/" + c)
-	keyy = c.split('__')[0]
-	if dictio[keyy] != c:
-		os.remove(paath)
-print "Deleted duplicate images"
+# # Delete duplicates based on object-IDs
+# dictio = {}
+# x = os.listdir(dirr)
+# print "Left with ",len(x)
+# for c in x:
+# 	paath = os.path.expanduser(dirr + "/" + c)
+# 	dictio[c.split('__')[0]] = c
+# for c in x:
+# 	paath = os.path.expanduser(dirr + "/" + c)
+# 	keyy = c.split('__')[0]
+# 	if dictio[keyy] != c:
+# 		os.remove(paath)
+# print "Deleted duplicate images"
 
 
-x = os.listdir(dirr)
-print "Left with ",len(x)
+# x = os.listdir(dirr)
+# print "Left with ",len(x)
 
-# Remove similar images
-cleanse.remove_duplicates(os.path.expanduser(dirr))
+# # Remove similar images
+# cleanse.remove_duplicates(os.path.expanduser(dirr))
 
 x = os.listdir(dirr)
 print "Left with ",len(x)
