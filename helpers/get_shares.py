@@ -12,18 +12,15 @@ from requests.packages import urllib3
 urllib3.disable_warnings()
 
 # iOS Messenger token
-TOKEN = 'EAADYPcrzZBmcBAApxLbVmdOadj0zkWIZBIBZAjwMTVZCxPqv00yhJYinou3CmsLZAISkoTctrDNdb0GLjl3YK5d712W31chUCyWtOCw5rbbbvgbYXZAVk6MSNNXwzSd5P2ZBTgouiZBuoq90JWDZCrgIuwJA4QTJjEdbVTdexg519tAZDZD'
+TOKEN = 'EAADYPcrzZBmcBAF76DbfFayn7eZB7PVF1l0ZCJMY5o6pIPbZAAezChB0ZAj9V4SvpzshHFZC61yYgzYnGMuVHYTK9feiVHOO6Aa8HqIq2VSKrhn4moEOSBZAVbgWuvkz3ZB03mcyChTC4oci7i1Q8FpUnJ2ebuTDNwCifC9m8qvWgQZDZD'
 LIMIT = 1000
 USERNAME = ""
 PASSWORD = ""
 
-def stalk(fb_id,USERNAME,PASSWORD):
-	client = MongoClient()
-	client.admin.authenticate(USERNAME,PASSWORD)
-	db = client['fb_15k_analysis']
+def stalk(fb_id):
+	fayel = open("/home/anshumans/Desktop/FB15K/"+fb_id,'w')
 	url = 'https://graph.facebook.com/v2.0/' + str(fb_id) + '/' + 'sharedposts?fields=from&limit=' + str(LIMIT) + '&access_token=' + TOKEN
-	resp = json.loads(requests.get(url).text) 
-	mine = db[str(fb_id)]
+	resp = json.loads(requests.get(url).text)
 	count = 0
 	while resp is not None and count < 10000:
 		if 'error' in resp:
@@ -47,7 +44,7 @@ def stalk(fb_id,USERNAME,PASSWORD):
 		for i in resp['data']:
 			try:
 				uid = i['from']['id']
-				mine.insert_one({"ID" : uid})
+				fayel.write(uid+"\n")
 				count += 1
 			except:
 				continue
@@ -76,7 +73,7 @@ def get_shares(USERNAME,PASSWORD):
 		spam.append(just_name)
 	for idee in spam:
 		idee2 = idee.split('__')[0]
-		jobs.append(Process(target = stalk, args=(idee2,USERNAME,PASSWORD,)))
+		jobs.append(Process(target = stalk, args=(idee2,)))
 	for j in jobs:
 		j.start()
 	for j in jobs:
