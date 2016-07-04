@@ -1,0 +1,38 @@
+radio telescope, radio reflector (11)
+eiffel tower (9)
+LOSS 0
+
+bolo tie, bolo, bola tie, bola (52)
+peace for Paris symbol (47)
+LOSS 0
+
+book jacket, dust cover, dust jacket, dust wrapper (149)
+poster (129) [poster,meme without snap of animated character; basically image with text such that it looks like a poster]
+LOSS 0
+
+stupa, tope (39)
+eiffel tower (38)
+LOSS 1
+
+obelisk (40)
+eiffel tower (39)
+LOSS 0
+
+envelope (32)
+poster (23)
+LOSS 0
+
+crane (40)
+eiffel tower (39)
+LOSS 0
+
+church, church building (36)
+eiffel tower (35)
+LOSS 6
+
+drilling platform, offshore rig (15)
+eiffel tower (15)
+LOSS 0
+
+incorrect = 1647 - [ (38+129+47+9+39+23+39+35+15) - (1+6)]
+total = 2819

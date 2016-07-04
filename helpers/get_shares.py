@@ -6,6 +6,7 @@ from multiprocessing import Process
 import requests
 import json
 import time
+import sys
 
 from requests.packages import urllib3
 urllib3.disable_warnings()
@@ -13,16 +14,18 @@ urllib3.disable_warnings()
 # iOS Messenger token
 TOKEN = 'EAADYPcrzZBmcBAApxLbVmdOadj0zkWIZBIBZAjwMTVZCxPqv00yhJYinou3CmsLZAISkoTctrDNdb0GLjl3YK5d712W31chUCyWtOCw5rbbbvgbYXZAVk6MSNNXwzSd5P2ZBTgouiZBuoq90JWDZCrgIuwJA4QTJjEdbVTdexg519tAZDZD'
 LIMIT = 1000
+USERNAME = ""
+PASSWORD = ""
 
-
-def stalk(fb_id):
+def stalk(fb_id,USERNAME,PASSWORD):
 	client = MongoClient()
-	db = client['fb_analysis']
+	client.admin.authenticate(USERNAME,PASSWORD)
+	db = client['fb_15k_analysis']
 	url = 'https://graph.facebook.com/v2.0/' + str(fb_id) + '/' + 'sharedposts?fields=from&limit=' + str(LIMIT) + '&access_token=' + TOKEN
 	resp = json.loads(requests.get(url).text) 
 	mine = db[str(fb_id)]
 	count = 0
-	while resp is not None and count < 50000:
+	while resp is not None and count < 10000:
 		if 'error' in resp:
 			if resp['error']['code'] == 100:
 				break
@@ -61,19 +64,19 @@ def stalk(fb_id):
 	print "Done with",fb_id,":",count
 
 
-def get_shares():
+def get_shares(USERNAME,PASSWORD):
 	client = MongoClient()
+	client.admin.authenticate(USERNAME,PASSWORD)
 	db = client['analysis']
-	ds = db['tags_with_spam_2'].find()
+	ds = db['data_team_use_2x'].find()
 	spam = []
 	jobs = []
 	for row in ds:
-		if row['spam'] == 1:
-			just_name = row['filename'].split('.')[0]
-			spam.append(just_name)
+		just_name = row['filename'].split('.')[0]
+		spam.append(just_name)
 	for idee in spam:
 		idee2 = idee.split('__')[0]
-		jobs.append(Process(target = stalk, args=(idee2,)))
+		jobs.append(Process(target = stalk, args=(idee2,USERNAME,PASSWORD,)))
 	for j in jobs:
 		j.start()
 	for j in jobs:
@@ -81,4 +84,4 @@ def get_shares():
 
 
 if __name__ == "__main__":
-	get_shares()
+	get_shares(sys.argv[1],sys.argv[2])
