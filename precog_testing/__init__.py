@@ -1,4 +1,1 @@
 import classify_image
-import cleanse
-import filter_check
-import populate
