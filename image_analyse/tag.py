@@ -24,20 +24,13 @@ from __future__ import print_function
 import matplotlib 
 matplotlib.use('Agg') 
 
-from os.path import abspath
-from skimage import io
-from multiprocessing import Process
-
-import dlib
-import exifread
 import re
 import os
-import json
 import numpy as np
 import tensorflow as tf
 
 
-path_to = abspath(__file__ + "/..")
+path_to = os.path.abspath(__file__ + "/..")
 
 
 class TensorLookup(object):
@@ -118,13 +111,13 @@ def ready_graph():
 
 
 def tensor_inference(image):
-  """Runs inference on every image in given path.
+  """Runs inference on given image.
 
   Args:
     image: actual image
 
   Returns:
-    Returns tag, along with confidence for that tag
+    Returns tag, along with confidence for that tag.
   """
   with tf.Session() as sess:
 
