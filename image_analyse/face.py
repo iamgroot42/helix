@@ -103,44 +103,41 @@ def Sentiment_Model(img):
 	return positive_score, negative_score
 
 # Loads graph into memory
-def ready_sentigraph():
+def ready():
 	sentiment.ready_graph()
-	return True
+	#Shape Predictor used for Facial Detection
+	predictor_path = path_to + '/features/shape_predictor_68_face_landmarks.dat'
+	predictor = dlib.shape_predictor(predictor_path)
+	#Delaunay_Traingles.csv contains a Pre-Defined Delaunay Triangulation that is used to generate Area Features of the test image
+	reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"),delimiter=',')
+	#Load the Trained Random Forest Classifier Model
+	clf = joblib.load(path_to + '/features/Combined_RFClassifier.pkl')
+	return clf, reader, predictor
 
 # Returns a json with everything related to the sentiment
 # associated with the input image
-def get_sentiment(img, img_array):
-	#Shape Predictor used for Facial Detection
-	predictor_path = path_to + '/features/shape_predictor_68_face_landmarks.dat'
-
+def get_sentiment(clf, reader, predictor, img, img_array):
 	#DLIB's Facial and Shape Predictor
 	detector = dlib.get_frontal_face_detector()
-	predictor = dlib.shape_predictor(predictor_path)
 	face_dict = {}
-	faceAbsent=0
+	faceAbsent = 0
 	face_dict = check_if_face(img_array, detector)
 
-	positive_inception_score,negative_inception_score = Sentiment_Model(img)
+	positive_inception_score, negative_inception_score = Sentiment_Model(img)
 
 	#If face does not exist, Use only the Tensorflow Architecture
 	#Mark FaceAbsent as True
 	for key in face_dict:
 		if key == 'No Face':
-			faceAbsent=1
+			faceAbsent = 1
 
 	#If Face Exists, Use both Face Emotion Recognition and Inception Model
-	if faceAbsent==0:
-	
-		#Delaunay_Traingles.csv contains a Pre-Defined Delaunay Triangulation that is used to generate Area Features of the test image
-		reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"),delimiter=',')
+	if faceAbsent == 0:
 		
 		triangle_points = []
 		for row in reader:
 			if '-99999' not in row:
 				triangle_points.append((row[0],row[1],row[2]))
-	
-		#Load the Trained Random Forest Classifier Model
-		clf = joblib.load(path_to + '/features/Combined_RFClassifier.pkl')
 		
 		positive_probability = 0
 		negative_probability = 0
@@ -172,11 +169,7 @@ def get_sentiment(img, img_array):
 	
 	#Populating the JSON that holds the Image Sentiment
 	image_sentiment_json = {}
-	
-	if faceAbsent==1:
-		image_sentiment_json["Face"] = {}
-	
-	elif faceAbsent==0:
+	if faceAbsent == 0:
 		image_sentiment_json["Face"] = {}
 		for face_number in score_dict:
 			image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
@@ -185,7 +178,6 @@ def get_sentiment(img, img_array):
 		image_sentiment_json["Face"]["Average"] = {}
 		image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability,3)
 		image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability,3)
-	
 	image_sentiment_json["Inception"] = {}
 	image_sentiment_json["Inception"]["Positive"] = positive_inception_score
 	image_sentiment_json["Inception"]["Negative"] = negative_inception_score
