@@ -93,13 +93,12 @@ def sentiment_inference(image):
   with tf.Session() as sess:
 
     final_tensor = sess.graph.get_tensor_by_name('final_result:0')
-          
-    # try:
-    predictions = sess.run(final_tensor,
+    try:
+      predictions = sess.run(final_tensor,
                            {'DecodeJpeg/contents:0': image})
-    # except:
-      # print(image)
-      # continue
+    except:
+      return {}
+      
     predictions = np.squeeze(predictions)
       # Creates node ID --> English string lookup.
     node_lookup = SentimentLookup()

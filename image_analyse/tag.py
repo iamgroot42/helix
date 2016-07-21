@@ -123,11 +123,11 @@ def tensor_inference(image):
 
     softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
 
-    # try:
-    predictions = sess.run(softmax_tensor,
+    try:
+      predictions = sess.run(softmax_tensor,
                             {'DecodeJpeg/contents:0': image})
-    # except:
-      # return {}
+    except:
+      return {}
 
     predictions = np.squeeze(predictions)
     # Creates node ID --> English string lookup.
