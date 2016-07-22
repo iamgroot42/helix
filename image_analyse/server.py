@@ -10,19 +10,15 @@ import pytesseract
 
 app = Flask(__name__)
 
-clf = None
-reader = None
-predictor = None
-
 
 def image_summary(img):
 	ret_json = {}
 	temp_image = Image.open(StringIO.StringIO(img))
 	img_array = misc.fromimage(temp_image)
-	ret_json['sentiment'] = face.get_sentiment(clf, reader, predictor, img, img_array)
+	ret_json['sentiment'] = face.get_sentiment(img, img_array)
 	ret_json['tag'] = tag.tensor_inference(img)
 	ret_json['text'] = pytesseract.image_to_string(temp_image, lang = 'eng')
-	if not (ret_json['sentiment'] and ret_json['tag']):
+	if not ( ret_json['tag']):
 		ret_json = -1
 	return handle(ret_json)
 
@@ -47,17 +43,22 @@ def analyze_image():
 
 @app.route("/analyze_url",  methods=['GET'])
 def analyze_url():
-	image_url = request.args['image_url']
-	response = urllib2.urlopen(image_url)
-	img = response.read()
+	try:
+		image_url = request.args['image_url']
+		req = urllib2.Request(image_url, headers = {'User-Agent': 'Mozilla/5.0'})
+		response = urllib2.urlopen(req)
+		img = response.read()
+	except Exception,e:
+		print e
+		return "Error downloading image for analysis."
 	try:
 		return str(image_summary(img))
 	except Exception, e:
 		print e
-	return "Could not process image"
+		return "Could not process image"
 
 
 if __name__ == "__main__":
-    clf, reader, predictor = face.ready()
+    face.ready()
     tag.ready_graph()
     app.run(host = '0.0.0.0')

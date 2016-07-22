@@ -15,10 +15,13 @@ matplotlib.use('Agg')
 
 
 path_to = os.path.abspath(__file__ + "/..")
+clf = None
+reader = None
+predictor = None
 
 
 #Function that takes the image path as input, and returns a dictionary of Facial Landmarks
-def get_landmarks(img_array, detector, predictor):
+def get_landmarks(img_array, detector):
     reference_28_vector = {}
     dets = detector(img_array, 1)
     for k, d in enumerate(dets):
@@ -32,9 +35,10 @@ def get_landmarks(img_array, detector, predictor):
 
     return new_points
 
+
 #Function to calculate the Feature Vectors of the test image based on a Pre-defined Delaunay Triangulation
 #Returns a list of Area Features for each face present in the image
-def delaunay_feature_vector(reference_28_vector,triangle_points):
+def delaunay_feature_vector(reference_28_vector, triangle_points):
 	distance_l1_l17 = np.linalg.norm(reference_28_vector[1]-reference_28_vector[17])
 	Area_Features = []
 	for triangle in triangle_points:
@@ -54,21 +58,21 @@ def delaunay_feature_vector(reference_28_vector,triangle_points):
 #Function to calculate the Feature Vectors based on the Distances between Landmarks obtained from get_landmarks function
 #Returns a list of landmark features for each face present in the image
 def landmark_feature_vector(reference_28_vector):
-    distance_l1_l17 = np.linalg.norm(reference_28_vector[1]-reference_28_vector[17])
+    distance_l1_l17 = np.linalg.norm(reference_28_vector[1] - reference_28_vector[17])
     features=[]
-    for i in range(1,69):
-        for j in range(i+1,69):
-            features.append(np.linalg.norm(reference_28_vector[i]-reference_28_vector[j])/distance_l1_l17)
+    for i in range(1, 69):
+        for j in range(i+1, 69):
+            features.append(np.linalg.norm(reference_28_vector[i] - reference_28_vector[j])/distance_l1_l17)
 
     return features
 
 
 #Function to integrate both Area Features and Landmark Distance features into a single feature vector
 #Returns a cumulative Feature Vector
-def generate_feature_vector(reference_28_vector,triangle_points):
+def generate_feature_vector(reference_28_vector, triangle_points):
 	Feature_Vector = []
 	Combined_Features = []
-	Area_Features = delaunay_feature_vector(reference_28_vector,triangle_points)
+	Area_Features = delaunay_feature_vector(reference_28_vector, triangle_points)
 	Landmark_Features = landmark_feature_vector(reference_28_vector)
 	for landmark in Landmark_Features:
 		Combined_Features.append(landmark)
@@ -84,7 +88,7 @@ def generate_feature_vector(reference_28_vector,triangle_points):
 def check_if_face(img_array, detector):
     dets = detector(img_array, 1)
     face_dict = {}
-    if len(dets)==0:
+    if len(dets) == 0:
     	face_dict['No Face'] = -1
     	return face_dict
     for k, d in enumerate(dets):
@@ -101,8 +105,12 @@ def Sentiment_Model(img):
 	negative_score = float(scores['negative'])
 	return positive_score, negative_score
 
-# Loads graph into memory
+
+# Loads graph(s) into memory
 def ready():
+	global clf
+	global reader
+	global predictor
 	sentiment.ready_graph()
 	#Shape Predictor used for Facial Detection
 	predictor_path = path_to + '/features/shape_predictor_68_face_landmarks.dat'
@@ -111,11 +119,11 @@ def ready():
 	reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"), delimiter = ',')
 	#Load the Trained Random Forest Classifier Model
 	clf = joblib.load(path_to + '/features/Combined_RFClassifier.pkl')
-	return clf, reader, predictor
+
 
 # Returns a json with everything related to the sentiment
 # associated with the input image
-def get_sentiment(clf, reader, predictor, img, img_array):
+def get_sentiment(img, img_array):
 	try:
 		#DLIB's Facial and Shape Predictor
 		detector = dlib.get_frontal_face_detector()
@@ -124,7 +132,6 @@ def get_sentiment(clf, reader, predictor, img, img_array):
 		face_dict = check_if_face(img_array, detector)
 
 		positive_inception_score, negative_inception_score = Sentiment_Model(img)
-
 		#If face does not exist, Use only the Tensorflow Architecture
 		#Mark FaceAbsent as True
 		for key in face_dict:
@@ -143,22 +150,22 @@ def get_sentiment(clf, reader, predictor, img, img_array):
 			negative_probability = 0
 			score_dict = {}
 			for face_number in face_dict:
-				if len(face_dict)>1:
+				if len(face_dict) > 1:
 					height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
-					width_padding = 0.25*(face_dict[face_number]['right']-face_dict[face_number]['left'])
-					cropped_image = img_array[face_dict[face_number]['top']-int(height_padding):face_dict[face_number]['bottom']+int(height_padding),face_dict[face_number]['left']-int(width_padding):face_dict[face_number]['right']+int(width_padding)]
-			
+					width_padding = 0.25*(face_dict[face_number]['right'] - face_dict[face_number]['left'])
+					cropped_image = img_array[face_dict[face_number]['top'] - int(height_padding):face_dict[face_number]['bottom'] + int(height_padding),face_dict[face_number]['left'] - int(width_padding):face_dict[face_number]['right'] + int(width_padding)]
 				try:
-					image_landmarks = get_landmarks(img_array, detector, predictor)
-					feature_vector = generate_feature_vector(image_landmarks,triangle_points)
+					image_landmarks = get_landmarks(img_array, detector)
+					feature_vector = generate_feature_vector(image_landmarks, triangle_points)
 			
 				#It may so happen that even when a face is detected, its landmarks may not be completely detected due to some obstruction on the face
 				#This catches such an exception
 				except Exception,e:
 					print e
 					continue
-	
+				print "DAMN1\n\n\n\n\n"				
 				result = clf.predict_proba(feature_vector)
+				print "DAMN2\n\n\n\n\n"
 				positive_probability += result[0][1]
 				negative_probability += result[0][0]
 				score_dict[face_number] = (result[0][1],result[0][0])
@@ -183,5 +190,6 @@ def get_sentiment(clf, reader, predictor, img, img_array):
 		image_sentiment_json["Inception"]["Negative"] = negative_inception_score
 	
 		return image_sentiment_json
-	except:
+	except Exception,e:
+		print e
 		return {}
