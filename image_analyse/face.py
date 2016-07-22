@@ -7,7 +7,7 @@ import os,dlib,csv,math
 import numpy as np
 from sklearn.externals import joblib
 
-import sentiment 
+import sentiment
 
 # Fix for headless machines:
 import matplotlib 
@@ -99,8 +99,8 @@ def check_if_face(img_array, detector):
 
 #Model Trained on Tensorflow architecture using Transfer Learning
 #Returns a positive score and a negative score for the input image
-def Sentiment_Model(img):
-	scores = sentiment.sentiment_inference(img)
+def Sentiment_Model(senti_graph, img):
+	scores = sentiment.sentiment_inference(senti_graph, img)
 	positive_score = float(scores['positive'])
 	negative_score = float(scores['negative'])
 	return positive_score, negative_score
@@ -111,7 +111,6 @@ def ready():
 	global clf
 	global reader
 	global predictor
-	sentiment.ready_graph()
 	#Shape Predictor used for Facial Detection
 	predictor_path = path_to + '/features/shape_predictor_68_face_landmarks.dat'
 	predictor = dlib.shape_predictor(predictor_path)
@@ -119,11 +118,12 @@ def ready():
 	reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"), delimiter = ',')
 	#Load the Trained Random Forest Classifier Model
 	clf = joblib.load(path_to + '/features/Combined_RFClassifier.pkl')
+	return sentiment.create_sentiment_graph()
 
 
 # Returns a json with everything related to the sentiment
 # associated with the input image
-def get_sentiment(img, img_array):
+def get_sentiment(senti_graph, img, img_array):
 	try:
 		#DLIB's Facial and Shape Predictor
 		detector = dlib.get_frontal_face_detector()
@@ -131,7 +131,7 @@ def get_sentiment(img, img_array):
 		faceAbsent = 0
 		face_dict = check_if_face(img_array, detector)
 
-		positive_inception_score, negative_inception_score = Sentiment_Model(img)
+		positive_inception_score, negative_inception_score = Sentiment_Model(senti_graph, img)
 		#If face does not exist, Use only the Tensorflow Architecture
 		#Mark FaceAbsent as True
 		for key in face_dict:
@@ -163,9 +163,7 @@ def get_sentiment(img, img_array):
 				except Exception,e:
 					print e
 					continue
-				print "DAMN1\n\n\n\n\n"				
 				result = clf.predict_proba(feature_vector)
-				print "DAMN2\n\n\n\n\n"
 				positive_probability += result[0][1]
 				negative_probability += result[0][0]
 				score_dict[face_number] = (result[0][1],result[0][0])
@@ -185,9 +183,9 @@ def get_sentiment(img, img_array):
 			image_sentiment_json["Face"]["Average"] = {}
 			image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability,3)
 			image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability,3)
-		image_sentiment_json["Inception"] = {}
-		image_sentiment_json["Inception"]["Positive"] = positive_inception_score
-		image_sentiment_json["Inception"]["Negative"] = negative_inception_score
+		image_sentiment_json["Tensorflow_SentiBank"] = {}
+		image_sentiment_json["Tensorflow_SentiBank"]["Positive"] = positive_inception_score
+		image_sentiment_json["Tensorflow_SentiBank"]["Negative"] = negative_inception_score
 	
 		return image_sentiment_json
 	except Exception,e:
