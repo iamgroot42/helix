@@ -99,7 +99,6 @@ def Sentiment_Model(img):
 	scores = sentiment.sentiment_inference(img)
 	positive_score = float(scores['positive'])
 	negative_score = float(scores['negative'])
-	# return 0.5,0.5
 	return positive_score, negative_score
 
 # Loads graph into memory
@@ -109,7 +108,7 @@ def ready():
 	predictor_path = path_to + '/features/shape_predictor_68_face_landmarks.dat'
 	predictor = dlib.shape_predictor(predictor_path)
 	#Delaunay_Traingles.csv contains a Pre-Defined Delaunay Triangulation that is used to generate Area Features of the test image
-	reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"),delimiter=',')
+	reader = csv.reader(open(path_to + "/features/Delaunay_Triangles.csv"), delimiter = ',')
 	#Load the Trained Random Forest Classifier Model
 	clf = joblib.load(path_to + '/features/Combined_RFClassifier.pkl')
 	return clf, reader, predictor
@@ -117,69 +116,72 @@ def ready():
 # Returns a json with everything related to the sentiment
 # associated with the input image
 def get_sentiment(clf, reader, predictor, img, img_array):
-	#DLIB's Facial and Shape Predictor
-	detector = dlib.get_frontal_face_detector()
-	face_dict = {}
-	faceAbsent = 0
-	face_dict = check_if_face(img_array, detector)
+	try:
+		#DLIB's Facial and Shape Predictor
+		detector = dlib.get_frontal_face_detector()
+		face_dict = {}
+		faceAbsent = 0
+		face_dict = check_if_face(img_array, detector)
 
-	positive_inception_score, negative_inception_score = Sentiment_Model(img)
+		positive_inception_score, negative_inception_score = Sentiment_Model(img)
 
-	#If face does not exist, Use only the Tensorflow Architecture
-	#Mark FaceAbsent as True
-	for key in face_dict:
-		if key == 'No Face':
-			faceAbsent = 1
+		#If face does not exist, Use only the Tensorflow Architecture
+		#Mark FaceAbsent as True
+		for key in face_dict:
+			if key == 'No Face':
+				faceAbsent = 1
 
-	#If Face Exists, Use both Face Emotion Recognition and Inception Model
-	if faceAbsent == 0:
+		#If Face Exists, Use both Face Emotion Recognition and Inception Model
+		if faceAbsent == 0:
 		
-		triangle_points = []
-		for row in reader:
-			if '-99999' not in row:
-				triangle_points.append((row[0],row[1],row[2]))
+			triangle_points = []
+			for row in reader:
+				if '-99999' not in row:
+					triangle_points.append((row[0],row[1],row[2]))
 		
-		positive_probability = 0
-		negative_probability = 0
-		score_dict = {}
-		for face_number in face_dict:
-			if len(face_dict)>1:
-				height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
-				width_padding = 0.25*(face_dict[face_number]['right']-face_dict[face_number]['left'])
-				cropped_image = img_array[face_dict[face_number]['top']-int(height_padding):face_dict[face_number]['bottom']+int(height_padding),face_dict[face_number]['left']-int(width_padding):face_dict[face_number]['right']+int(width_padding)]
+			positive_probability = 0
+			negative_probability = 0
+			score_dict = {}
+			for face_number in face_dict:
+				if len(face_dict)>1:
+					height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
+					width_padding = 0.25*(face_dict[face_number]['right']-face_dict[face_number]['left'])
+					cropped_image = img_array[face_dict[face_number]['top']-int(height_padding):face_dict[face_number]['bottom']+int(height_padding),face_dict[face_number]['left']-int(width_padding):face_dict[face_number]['right']+int(width_padding)]
 			
-			try:
-				image_landmarks = get_landmarks(img_array, detector, predictor)
-				feature_vector = generate_feature_vector(image_landmarks,triangle_points)
+				try:
+					image_landmarks = get_landmarks(img_array, detector, predictor)
+					feature_vector = generate_feature_vector(image_landmarks,triangle_points)
 			
-			#It may so happen that even when a face is detected, its landmarks may not be completely detected due to some obstruction on the face
-			#This catches such an exception
-			except Exception,e:
-				print e
-				continue
+				#It may so happen that even when a face is detected, its landmarks may not be completely detected due to some obstruction on the face
+				#This catches such an exception
+				except Exception,e:
+					print e
+					continue
 	
-			result = clf.predict_proba(feature_vector)
-			positive_probability += result[0][1]
-			negative_probability += result[0][0]
-			score_dict[face_number] = (result[0][1],result[0][0])
+				result = clf.predict_proba(feature_vector)
+				positive_probability += result[0][1]
+				negative_probability += result[0][0]
+				score_dict[face_number] = (result[0][1],result[0][0])
 	
-		positive_probability = positive_probability/len(face_dict)
-		negative_probability = negative_probability/len(face_dict)
+			positive_probability = positive_probability/len(face_dict)
+			negative_probability = negative_probability/len(face_dict)
 	
 	
-	#Populating the JSON that holds the Image Sentiment
-	image_sentiment_json = {}
-	if faceAbsent == 0:
-		image_sentiment_json["Face"] = {}
-		for face_number in score_dict:
-			image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
-			image_sentiment_json["Face"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
-			image_sentiment_json["Face"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
-		image_sentiment_json["Face"]["Average"] = {}
-		image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability,3)
-		image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability,3)
-	image_sentiment_json["Inception"] = {}
-	image_sentiment_json["Inception"]["Positive"] = positive_inception_score
-	image_sentiment_json["Inception"]["Negative"] = negative_inception_score
+		#Populating the JSON that holds the Image Sentiment
+		image_sentiment_json = {}
+		if faceAbsent == 0:
+			image_sentiment_json["Face"] = {}
+			for face_number in score_dict:
+				image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
+				image_sentiment_json["Face"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
+				image_sentiment_json["Face"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
+			image_sentiment_json["Face"]["Average"] = {}
+			image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability,3)
+			image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability,3)
+		image_sentiment_json["Inception"] = {}
+		image_sentiment_json["Inception"]["Positive"] = positive_inception_score
+		image_sentiment_json["Inception"]["Negative"] = negative_inception_score
 	
-	return image_sentiment_json
+		return image_sentiment_json
+	except:
+		return {}

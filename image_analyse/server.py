@@ -60,4 +60,4 @@ def analyze_url():
 if __name__ == "__main__":
     clf, reader, predictor = face.ready()
     tag.ready_graph()
-    app.run()
+    app.run(host = '0.0.0.0')
