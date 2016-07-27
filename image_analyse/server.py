@@ -2,6 +2,7 @@ import face, tag
 
 from flask import Flask, request
 from multiprocessing import Process, Manager
+from pymongo import MongoClient
 
 from PIL import Image
 from scipy import misc
@@ -10,7 +11,8 @@ import urllib2
 import pytesseract
 
 app = Flask(__name__)
-
+USERNAME = 'anshumans'
+PASSWORD = '@nshumaN'
 
 def senti_part(img, img_array, dictio):
 	senti_graph = face.ready()
@@ -69,16 +71,27 @@ def analyze_image():
 
 @app.route("/analyze_url",  methods=['GET'])
 def analyze_url():
+	client = MongoClient()
+	db = client['image_api']
+	# db.authenticate(USERNAME, PASSWORD) 
+	ds = db['v1.0']
 	try:
 		image_url = request.args['image_url']
 		req = urllib2.Request(image_url, headers = {'User-Agent': 'Mozilla/5.0'})
 		response = urllib2.urlopen(req)
 		img = response.read()
+		cache = ds.find({'_id':image_url})
+		# Check if result is available in cache
+		if cache.count():
+			if cache[0]['size'] == len(img):
+				return cache[0]['result']
 	except Exception,e:
 		print e
 		return "Error downloading image for analysis."
 	try:
-		return str(image_summary(img))
+		cache_it = str(image_summary(img))
+		ds.insert_one({'_id':image_url, 'size':len(img), 'result': cache_it})
+		return cache_it
 	except Exception, e:
 		print e
 		return "Could not process image"
