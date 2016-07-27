@@ -72,15 +72,11 @@ def create_sentiment_graph():
   with tf.gfile.FastGFile(path_to + '/features/output_graph_9.pb', 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
-    _ = tf.import_graph_def(graph_def, name='')
+    senti_graph = tf.import_graph_def(graph_def, name='')
+    return senti_graph
 
 
-def ready_graph():
-  # Creates graph from saved GraphDef.
-  create_sentiment_graph()
-
-
-def sentiment_inference(image):
+def sentiment_inference(senti_graph, image):
   """Runs inference on given image.
 
   Args:
@@ -90,7 +86,7 @@ def sentiment_inference(image):
     Returns positive and negative sentiment scores.
   """
 
-  with tf.Session() as sess:
+  with tf.Session(graph = senti_graph) as sess:
 
     final_tensor = sess.graph.get_tensor_by_name('final_result:0')
     try:

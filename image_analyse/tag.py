@@ -32,7 +32,6 @@ import tensorflow as tf
 
 path_to = os.path.abspath(__file__ + "/..")
 
-
 class TensorLookup(object):
   """Converts integer node ID's to human readable labels."""
 
@@ -96,21 +95,17 @@ class TensorLookup(object):
     return self.node_lookup[node_id]
 
 
-def create_tensor_graph():
+def ready_graph():
   """Creates a graph from saved GraphDef file and returns a saver."""
   # Creates graph from saved graph_def.pb.
   with tf.gfile.FastGFile(path_to + '/features/classify_image_graph_def.pb', 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
-    _ = tf.import_graph_def(graph_def, name='')
+    tag_graph = tf.import_graph_def(graph_def, name='')
+    return tag_graph
 
 
-def ready_graph():
-  # Creates graph from saved GraphDef.
-  create_tensor_graph()
-
-
-def tensor_inference(image):
+def tensor_inference(tag_graph, image):
   """Runs inference on given image.
 
   Args:
@@ -119,7 +114,7 @@ def tensor_inference(image):
   Returns:
     Returns tag, along with confidence for that tag.
   """
-  with tf.Session() as sess:
+  with tf.Session(graph = tag_graph) as sess:
 
     softmax_tensor = sess.graph.get_tensor_by_name('softmax:0')
 
