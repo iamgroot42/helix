@@ -1,10 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "Precog",
-  "description": "Alpha version of image analyzer",
+  "name": "Helix",
+  "description": "Precog's image analysis tool",
   "version": "0.1",
   "content_scripts": [{
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["https://facebook.com/*"],
       "js": ["js/jquery-3.0.0.min.js"],
       "run_at": "document_start"
     }],
@@ -18,10 +18,10 @@
     },
   "permissions": [
    "activeTab","webRequest",
-          "https://voice6-byld.rhcloud.com/*"
+          "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*"
    ],
   "externally_connectable" : {
-    "matches": [ "https://voice6-byld.rhcloud.com/*" ]
+    "matches": [ "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*" ]
   },
     "web_accessible_resources": [
     "icon.png"

@@ -19,6 +19,10 @@ app = Flask(__name__)
 USERNAME = ''
 PASSWORD = ''
 
+# Error codes mapping
+# 100 : error downloading image
+# 101 : not JPEG image
+# 102 : unexpected error, contact admin
 
 def senti_part(img, img_array, dictio):
 	senti_graph = face.ready()
@@ -96,11 +100,11 @@ def analyze_url():
 				return cache[0]['result']
 	except Exception,e:
 		print "Error in server.py:",e
-		return "Error downloading image for analysis", 401
+		return json.dumps({"error": 100})
 	try:
 		result = image_summary(img)
-		if result == "-1":
-			return "JPEG/PNG expected", 400
+		if result == -1:
+			return json.dumps({"error": 101})
 		else:
 			cache_it = json.dumps(result.copy())
 			md5_hash = hashlib.md5(img).hexdigest()
@@ -114,7 +118,7 @@ def analyze_url():
 			return cache_it
 	except Exception, e:
 		print "Error in server.py:",e
-		return "Unexpected error", 402
+		return json.dumps({"error": 102})
 
 
 if __name__ == "__main__":

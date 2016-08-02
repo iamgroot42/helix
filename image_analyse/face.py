@@ -154,7 +154,7 @@ def get_sentiment(senti_graph, img, img_array):
 			for face_number in face_dict:
 				cropped_image = None
 				feature_vector = None
-				if len(face_dict) > 1:
+				if len(face_dict) > 0:
 					height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
 					width_padding = 0.25*(face_dict[face_number]['right'] - face_dict[face_number]['left'])
 					cropped_image = np.array(img_array[face_dict[face_number]['top'] - int(height_padding):face_dict[face_number]['bottom'] + int(height_padding),face_dict[face_number]['left'] - int(width_padding):face_dict[face_number]['right'] + int(width_padding)])
