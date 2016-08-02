@@ -81,7 +81,7 @@ def analyze_url():
 	received = datetime.datetime.now()
 	client = MongoClient()
 	db = client['image_api']
-	db.authenticate(USERNAME, PASSWORD) 
+	# db.authenticate(USERNAME, PASSWORD) 
 	ds = db['v1.0']
 	try:
 		image_url = request.args['image_url']
@@ -109,7 +109,6 @@ def analyze_url():
 				'timestamp': received, 'md5': md5_hash, 'headers':request.headers['User-Agent'],
 				'time taken': (now-received).total_seconds() * 1000.0
 			}
-			print data_entry
 			ds.insert_one(data_entry)
 			return cache_it
 	except Exception, e:
@@ -123,4 +122,4 @@ if __name__ == "__main__":
 	except:
 		print "python " + sys.argv[0] + " <USERNAME> <PASSWORD>"
 		exit()
-	app.run(host = '0.0.0.0')
+	app.run(host = '0.0.0.0', processes = 10)
