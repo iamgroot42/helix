@@ -24,6 +24,7 @@ predictor = None
 def get_landmarks(img_array, detector):
     reference_28_vector = {}
     dets = detector(img_array, 1)
+    ret_value = {}
     for k, d in enumerate(dets):
         shape = predictor(img_array, d)
         new_points = {}
@@ -32,8 +33,9 @@ def get_landmarks(img_array, detector):
             y_point = shape.part(i).y
             point_array = np.array((x_point,y_point))
             new_points[i+1] = point_array
+        ret_value = new_points
 
-    return new_points
+    return ret_value
 
 
 #Function to calculate the Feature Vectors of the test image based on a Pre-defined Delaunay Triangulation

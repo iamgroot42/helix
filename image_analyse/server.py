@@ -81,7 +81,7 @@ def analyze_url():
 	received = datetime.datetime.now()
 	client = MongoClient()
 	db = client['image_api']
-	# db.authenticate(USERNAME, PASSWORD) 
+	db.authenticate(USERNAME, PASSWORD) 
 	ds = db['v1.0']
 	try:
 		image_url = request.args['image_url']
