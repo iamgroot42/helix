@@ -10,6 +10,10 @@ import StringIO
 import urllib2
 import pytesseract
 import sys
+import datetime
+import hashlib
+import json
+
 
 app = Flask(__name__)
 USERNAME = ''
@@ -34,7 +38,7 @@ def image_summary(img):
 	temp_image = Image.open(StringIO.StringIO(img))
 	img_array = misc.fromimage(temp_image)
 	if temp_image.format == "PNG":
-		
+		return -1
 	elif temp_image.format != "JPEG":
 		return -1
 	# Shared dictionary
@@ -61,19 +65,20 @@ def handle(x):
 		return x
 
 
-@app.route("/analyze_image",  methods=['POST'])
-def analyze_image():
-	imagefile = request.files['imagefile']
-	img =  imagefile.stream.read()
-	try:
-		return str(image_summary(img))
-	except Exception, e:
-		print e
-	return "JPEG/PNG expected", 400
+# @app.route("/analyze_image",  methods=['POST'])
+# def analyze_image():
+# 	imagefile = request.files['imagefile']
+# 	img =  imagefile.stream.read()
+# 	try:
+# 		return str(image_summary(img))
+# 	except Exception, e:
+# 		print e
+# 	return "JPEG/PNG expected", 400
 
 
 @app.route("/analyze_url",  methods=['GET'])
 def analyze_url():
+	received = datetime.datetime.now()
 	client = MongoClient()
 	db = client['image_api']
 	db.authenticate(USERNAME, PASSWORD) 
@@ -86,20 +91,29 @@ def analyze_url():
 		cache = ds.find({'_id': image_url})
 		# Check if result is available in cache
 		if cache.count():
-			if cache[0]['size'] == len(img):
+			if cache[0]['size'] == len(img) and cache[0]['md5'] == hashlib.md5(img).hexdigest():
+				print "cache hit"
 				return cache[0]['result']
 	except Exception,e:
-		print e
+		print "Error in server.py:",e
 		return "Error downloading image for analysis", 401
 	try:
-		cache_it = str(image_summary(img))
+		cache_it = json.dumps(image_summary(img).copy())
 		if cache_it == "-1":
 			return "JPEG/PNG expected", 400
 		else:
-			ds.insert_one({'_id': image_url, 'size': len(img), 'result': cache_it})
+			md5_hash = hashlib.md5(img).hexdigest()
+			now = datetime.datetime.now()
+			data_entry = {
+				'_id': image_url, 'size': len(img), 'result': cache_it,
+				'timestamp': received, 'md5': md5_hash, 'headers':request.headers['User-Agent'],
+				'time taken': (now-received).total_seconds() * 1000.0
+			}
+			print data_entry
+			ds.insert_one(data_entry)
 			return cache_it
 	except Exception, e:
-		print e
+		print "Error in server.py:",e
 		return "Unexpected error", 402
 
 

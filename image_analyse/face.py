@@ -130,7 +130,6 @@ def get_sentiment(senti_graph, img, img_array):
 		face_dict = {}
 		faceAbsent = 0
 		face_dict = check_if_face(img_array, detector)
-
 		positive_inception_score, negative_inception_score = Sentiment_Model(senti_graph, img)
 		#If face does not exist, Use only the Tensorflow Architecture
 		#Mark FaceAbsent as True
@@ -149,27 +148,26 @@ def get_sentiment(senti_graph, img, img_array):
 			positive_probability = 0
 			negative_probability = 0
 			score_dict = {}
+			denominator = len(face_dict)
 			for face_number in face_dict:
+				cropped_image = None
+				feature_vector = None
 				if len(face_dict) > 1:
 					height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
 					width_padding = 0.25*(face_dict[face_number]['right'] - face_dict[face_number]['left'])
-					cropped_image = img_array[face_dict[face_number]['top'] - int(height_padding):face_dict[face_number]['bottom'] + int(height_padding),face_dict[face_number]['left'] - int(width_padding):face_dict[face_number]['right'] + int(width_padding)]
+					cropped_image = np.array(img_array[face_dict[face_number]['top'] - int(height_padding):face_dict[face_number]['bottom'] + int(height_padding),face_dict[face_number]['left'] - int(width_padding):face_dict[face_number]['right'] + int(width_padding)])
 				try:
-					image_landmarks = get_landmarks(img_array, detector)
+					image_landmarks = get_landmarks(cropped_image, detector)
 					feature_vector = generate_feature_vector(image_landmarks, triangle_points)
-			
+					result = clf.predict_proba(feature_vector)
+					positive_probability += result[0][1]
+					negative_probability += result[0][0]
+					score_dict[face_number] = (result[0][1],result[0][0])
 				#It may so happen that even when a face is detected, its landmarks may not be completely detected due to some obstruction on the face
-				#This catches such an exception
+				#This catches such an exception. Also, face shouldn't be considered for average either
 				except Exception,e:
-					print e
-					continue
-				result = clf.predict_proba(feature_vector)
-				positive_probability += result[0][1]
-				negative_probability += result[0][0]
-				score_dict[face_number] = (result[0][1],result[0][0])
-	
-			positive_probability = positive_probability/len(face_dict)
-			negative_probability = negative_probability/len(face_dict)
+					print "Error in face.py:",e
+					denominator -= 1
 	
 	
 		#Populating the JSON that holds the Image Sentiment
@@ -177,17 +175,23 @@ def get_sentiment(senti_graph, img, img_array):
 		if faceAbsent == 0:
 			image_sentiment_json["Face"] = {}
 			for face_number in score_dict:
-				image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
-				image_sentiment_json["Face"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
-				image_sentiment_json["Face"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
-			image_sentiment_json["Face"]["Average"] = {}
-			image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability,3)
-			image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability,3)
+				try:
+					image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
+					image_sentiment_json["Face"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
+					image_sentiment_json["Face"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
+				except:
+					print "Error in face.py:",e
+			try: 
+				image_sentiment_json["Face"]["Average"] = {}
+				image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability/denominator,3)
+				image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability/denominator,3)
+			except:
+				print "Error in face.py:",e
 		image_sentiment_json["Tensorflow_SentiBank"] = {}
 		image_sentiment_json["Tensorflow_SentiBank"]["Positive"] = positive_inception_score
 		image_sentiment_json["Tensorflow_SentiBank"]["Negative"] = negative_inception_score
 	
 		return image_sentiment_json
 	except Exception,e:
-		print e
+		print "Error in face.py:",e
 		return {}
