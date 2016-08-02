@@ -98,10 +98,11 @@ def analyze_url():
 		print "Error in server.py:",e
 		return "Error downloading image for analysis", 401
 	try:
-		cache_it = json.dumps(image_summary(img).copy())
-		if cache_it == "-1":
+		result = image_summary(img)
+		if result == "-1":
 			return "JPEG/PNG expected", 400
 		else:
+			cache_it = json.dumps(result.copy())
 			md5_hash = hashlib.md5(img).hexdigest()
 			now = datetime.datetime.now()
 			data_entry = {
