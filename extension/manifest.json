@@ -1,29 +1,31 @@
 {
   "manifest_version": 2,
-  "name": "Helix",
-  "description": "Precog's image analysis tool",
+  "name": "HelixAPI",
+  "description": "potato",
   "version": "0.1",
-  "content_scripts": [{
-      "matches": ["https://facebook.com/*"],
-      "js": ["js/jquery-3.0.0.min.js"],
-      "run_at": "document_start"
-    }],
   "browser_action": {
-   "default_icon": "icons/icon128.png",
-   "default_popup": "html/home.html"
+    "default_popup": "html/popup.html"
   },
+  "background": {
+    "scripts": ["js/api.js"],
+    "persistent": false
+  },
+  "content_scripts":
+    [
+        {
+            "matches": ["<all_urls>"],
+            "js":["js/jquery-3.0.0.min.js", "js/popup.js"]
+        }
+    ],
   "icons": { "16": "icons/icon16.png",
            "48": "icons/icon48.png",
           "128": "icons/icon128.png" 
     },
+  "web_accessible_resources": ["icons/icon16.png"],
   "permissions": [
-   "activeTab","webRequest",
-          "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*"
-   ],
+    "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*"
+  ],
   "externally_connectable" : {
     "matches": [ "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*" ]
-  },
-    "web_accessible_resources": [
-    "icon.png"
-  ]
+  }
 }
