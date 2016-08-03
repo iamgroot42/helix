@@ -1,5 +1,5 @@
 // Original code by : Prateek Dewan 
-// Slightly modified by : iamgroot42
+// Modified by : iamgroot42
 
 $ (document).ready( function() {
 
@@ -25,9 +25,8 @@ $ (document).ready( function() {
   })();
 
 
-  if (document.getElementById('globalContainer') !== null) {   //'contentArea'
+  if (document.getElementById('globalContainer') !== null) {   
     observeDOM( document.getElementById('globalContainer') ,function(){
-
 
         $("._5pcq").each(function() {
           var elem = this;
@@ -36,49 +35,57 @@ $ (document).ready( function() {
             $(this).addClass("analysed");
             $(this).append("<span class='HelixAPIanalysis'> Analysing</span>");
 
-            var postId = "";
-
-            if (url.indexOf("fbid") > -1) {
-              postId = url.substring(url.indexOf("fbid") + 5, url.indexOf("&", url.indexOf("fbid") + 5));
+            var image_id = "";
+            var index = url.indexOf("fbid");
+            if (index > -1) {
+              image_id = url.substring(index + 5, url.indexOf("&", index + 5));
             }
             else if (url.indexOf("posts") > -1) {
-              postId = url.split("/")[url.split("/").length-1];
+              image_id = url.split("/")[url.split("/").length-1];
             } else if (url.indexOf("permalink") > -1 || url.indexOf("photos") > -1) {
-              postId = url.split("/")[url.split("/").length-2];
-            } else {
-              postId = "1234";
+              image_id = url.split("/")[url.split("/").length-2];
             }
-
-            var image_url = 'image_url=https://dz2k5jx87b7zc.cloudfront.net/wp-content/uploads/2013/05/All-American-Potato-Salad.jpg.jpg';
+            console.log(image_id);
+            // var access_token = "<ACCESS TOKEN FROM APP/IPOD>";
+            var access_token = "EAACEdEose0cBAA9BZBJEFrQKUgq7oLZCZAlnzFJWFGVpZAIevZCDqZAIdZCcFUOGKoOyMxN6QPovWg7GdWktyOp2anndBjuHcSN1NorKob5ZAqze36AYReWQ7OkMqimeaedVQew64oR2zNCvS7FxpJEiHIK0HUzm52lnnhDya0lZAEAZDZD";
+            var graph_url = "https://graph.facebook.com/v2.7/" + image_id + "?fields=source&access_token=" + access_token;
+            // var image_url = 'image_url=https://dz2k5jx87b7zc.cloudfront.net/wp-content/uploads/2013/05/All-American-Potato-Salad.jpg.jpg';
             var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_url";
-
             // Way to get send message compatibility over all chrome browser versions
-            if (!chrome.runtime) {
-                // Chrome 20-21
-                chrome.runtime = chrome.extension;
-            } else if(!chrome.runtime.onMessage) {
-                // Chrome 22-25
-                chrome.runtime.onMessage = chrome.extension.onMessage;
-                chrome.runtime.sendMessage = chrome.extension.sendMessage;
-                chrome.runtime.onConnect = chrome.extension.onConnect;
-                chrome.runtime.connect = chrome.extension.connect;
-            }
-            alert('sending get!');
+            if(image_id != ""){
+              $.ajax({
+                type: 'GET',
+                url: graph_url,
+                success: function(ajax_response) {
+                    var graph_obj = JSON.parse(ajax_response);
+                    // If it's a public image
+                    if('source' in graph_obj){
+                      var image_url = graph_obj['source'];
+                      if (!chrome.runtime) {
+                        // Chrome 20-21
+                        chrome.runtime = chrome.extension;
+                      } else if(!chrome.runtime.onMessage) {
+                        // Chrome 22-25
+                        chrome.runtime.onMessage = chrome.extension.onMessage;
+                        chrome.runtime.sendMessage = chrome.extension.sendMessage;
+                        chrome.runtime.onConnect = chrome.extension.onConnect;
+                        chrome.runtime.connect = chrome.extension.connect;
+                      }
 
-            chrome.runtime.sendMessage({
-                method: 'GET',
-                action: 'xhttp',
-                url: apiCallUrl,
-                data : image_url
-            }, function (responseText) {
-                $(elem).find(".HelixAPIanalysis").html("");
-                // var obj = JSON.parse(responseText);
-                console.log(responseText);
-                // if ('label' in obj && obj['label'] == "Malicious") {
-                  // $(elem).append("<a href='http://precog.iiitd.edu.in/osm.html#fbi'> <img src='"+chrome.extension.getURL('error.png')+"' title='Confidence:" + obj['confidence'] + ".&#013Click on image for more details'></a>");
-                  // $(elem).append("<a href='http://google.com>Google</a>");
-                // }
-            });
+                      chrome.runtime.sendMessage({
+                        method: 'GET',
+                        action: 'xhttp',
+                        url: apiCallUrl,
+                        data : image_url
+                        }, function (responseText) {
+                          $(elem).find(".HelixAPIanalysis").html("");
+                          // var obj = JSON.parse(responseText);
+                          console.log(responseText);
+                        });
+                      }
+                  }
+              });
+            }
           }
         });
     });
