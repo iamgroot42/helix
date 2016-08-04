@@ -9,8 +9,7 @@
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", request.url + "?" + request.data, false );
+    xmlHttp.open( "GET", request.url + request.data, false );
     xmlHttp.send( null );
     callback(xmlHttp.responseText);
-
 });

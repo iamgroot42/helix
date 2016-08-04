@@ -2,7 +2,6 @@
 // Modified by : iamgroot42
 
 $ (document).ready( function() {
-
   var observeDOM = (function(){
       var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
           eventListenerSupported = window.addEventListener;
@@ -33,7 +32,7 @@ $ (document).ready( function() {
           if($(this).find("._5ptz").length > 0 && $(this).find(".HelixAPIanalysis").length == 0) {
             var url = $(this).attr("href");
             $(this).addClass("analysed");
-            $(this).append("<span class='HelixAPIanalysis'> Analysing</span>");
+            $(this).append("<span class='HelixAPIanalysis'> </span>");
 
             var image_id = "";
             var index = url.indexOf("fbid");
@@ -45,19 +44,17 @@ $ (document).ready( function() {
             } else if (url.indexOf("permalink") > -1 || url.indexOf("photos") > -1) {
               image_id = url.split("/")[url.split("/").length-2];
             }
-            console.log(image_id);
             // var access_token = "<ACCESS TOKEN FROM APP/IPOD>";
-            var access_token = "EAACEdEose0cBAA9BZBJEFrQKUgq7oLZCZAlnzFJWFGVpZAIevZCDqZAIdZCcFUOGKoOyMxN6QPovWg7GdWktyOp2anndBjuHcSN1NorKob5ZAqze36AYReWQ7OkMqimeaedVQew64oR2zNCvS7FxpJEiHIK0HUzm52lnnhDya0lZAEAZDZD";
-            var graph_url = "https://graph.facebook.com/v2.7/" + image_id + "?fields=source&access_token=" + access_token;
-            // var image_url = 'image_url=https://dz2k5jx87b7zc.cloudfront.net/wp-content/uploads/2013/05/All-American-Potato-Salad.jpg.jpg';
-            var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_url";
+            var access_token = "EAACEdEose0cBAIRxyqRID1E62rFZANBOZCdNRF3AxP18Kd7yGv8iLQKoZBZAclvwm8DZCFiG5KJ4DCMcQiq1bvRhZBZCpwV84KHZA184kpGh9GxO3dKV6tgQHDTksbhHphCTtFyqbKJZB1ekVlYVMB8QrFA9R98BujTZArGjRTH9xQHgZDZD";
+            var graph_url = "https://graph.facebook.com/v2.3/" + image_id + "?fields=source&access_token=" + access_token;
+            var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_url?image_url=";
             // Way to get send message compatibility over all chrome browser versions
             if(image_id != ""){
               $.ajax({
                 type: 'GET',
                 url: graph_url,
-                success: function(ajax_response) {
-                    var graph_obj = JSON.parse(ajax_response);
+                dataType: 'json',
+                success: function(graph_obj) {
                     // If it's a public image
                     if('source' in graph_obj){
                       var image_url = graph_obj['source'];
@@ -71,7 +68,7 @@ $ (document).ready( function() {
                         chrome.runtime.onConnect = chrome.extension.onConnect;
                         chrome.runtime.connect = chrome.extension.connect;
                       }
-
+                      // Send GET request to HelixAPI
                       chrome.runtime.sendMessage({
                         method: 'GET',
                         action: 'xhttp',
@@ -79,8 +76,13 @@ $ (document).ready( function() {
                         data : image_url
                         }, function (responseText) {
                           $(elem).find(".HelixAPIanalysis").html("");
-                          // var obj = JSON.parse(responseText);
-                          console.log(responseText);
+                          var obj = JSON.parse(responseText);
+                          if(!("error" in obj)){
+                          	console.log(responseText);
+                          	var senti = obj['sentiment'];
+                          	var tag = obj['tag'];
+                          	var text = obj['text'];
+                          }
                         });
                       }
                   }
