@@ -45,7 +45,7 @@ $ (document).ready( function() {
               image_id = url.split("/")[url.split("/").length-2];
             }
             // var access_token = "<ACCESS TOKEN FROM APP/IPOD>";
-            var access_token = "EAACEdEose0cBAIRxyqRID1E62rFZANBOZCdNRF3AxP18Kd7yGv8iLQKoZBZAclvwm8DZCFiG5KJ4DCMcQiq1bvRhZBZCpwV84KHZA184kpGh9GxO3dKV6tgQHDTksbhHphCTtFyqbKJZB1ekVlYVMB8QrFA9R98BujTZArGjRTH9xQHgZDZD";
+            var access_token = "EAACEdEose0cBAKfccPT5DMRmpb4NmQGatD1mTsbsio3IWKWE3Rah5O8p9XEthBMDYJ6hgVWkIZBxt3GVpL1mFjKu4GukBf0uZB7kfN3BEK09xkYQAECDAfKR3vKiEZB1re4qPHTYGsNZCOkPPwbzgO7wgrt93LfwavcmWYUCFQZDZD";
             var graph_url = "https://graph.facebook.com/v2.3/" + image_id + "?fields=source&access_token=" + access_token;
             var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_url?image_url=";
             // Way to get send message compatibility over all chrome browser versions
@@ -58,6 +58,10 @@ $ (document).ready( function() {
                     // If it's a public image
                     if('source' in graph_obj){
                       var image_url = graph_obj['source'];
+                      // Convert png to jpg (if it is png) by simply renaming; FB allows that :)
+                      // if(image_url.lastIndexOf(".png") == image_url.length - 3){
+                      // 	image_url = image_url.split(".png")[0] + ".jpg";
+                      // }
                       if (!chrome.runtime) {
                         // Chrome 20-21
                         chrome.runtime = chrome.extension;
@@ -82,6 +86,24 @@ $ (document).ready( function() {
                           	var senti = obj['sentiment'];
                           	var tag = obj['tag'];
                           	var text = obj['text'];
+                          	if(text != ""){
+                          		// Display 'text'
+                          	}
+                          	for (var key in senti['faces']) {
+							  	// Insert one of 5 emoticons depending on value of 
+							  	// senti['faces'][key]['Positive']
+							}
+							// Insert one of 5 emoticons depending on value of 
+							// senti['Tensorflow_SentiBank']['Positive']
+							try{
+								// Insert one of 5 emoticons depending on value of 
+								// senti['Average']['Positive']
+							}
+							catch(err){
+								// Do nothing, no faces, so no emotion
+							}
+							// Display tag, with color in [R,G] proportional to senti['tag']['confidence']
+							// senti['tag']['tag']
                           }
                         });
                       }
