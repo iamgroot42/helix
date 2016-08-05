@@ -1,8 +1,11 @@
 import face, tag
 
-from flask import Flask, request
+from flask import Flask, request, make_response, current_app
 from multiprocessing import Process, Manager
 from pymongo import MongoClient
+from datetime import timedelta
+from functools import update_wrapper
+
 
 from PIL import Image
 from scipy import misc
@@ -18,6 +21,54 @@ import json
 app = Flask(__name__)
 USERNAME = ''
 PASSWORD = ''
+
+# Error codes mapping
+# 100 : error downloading image
+# 101 : not JPEG image
+# 102 : unexpected error, contact admin
+
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            h['Access-Control-Allow-Credentials'] = 'true'
+            h['Access-Control-Allow-Headers'] = \
+                "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
 
 
 def senti_part(img, img_array, dictio):
@@ -77,6 +128,7 @@ def handle(x):
 
 
 @app.route("/analyze_url",  methods=['GET'])
+@crossdomain(origin='*')
 def analyze_url():
 	received = datetime.datetime.now()
 	client = MongoClient()
@@ -96,11 +148,11 @@ def analyze_url():
 				return cache[0]['result']
 	except Exception,e:
 		print "Error in server.py:",e
-		return "Error downloading image for analysis", 401
+		return json.dumps({"error": 100})
 	try:
 		result = image_summary(img)
-		if result == "-1":
-			return "JPEG/PNG expected", 400
+		if result == -1:
+			return json.dumps({"error": 101})
 		else:
 			cache_it = json.dumps(result.copy())
 			md5_hash = hashlib.md5(img).hexdigest()
@@ -114,7 +166,7 @@ def analyze_url():
 			return cache_it
 	except Exception, e:
 		print "Error in server.py:",e
-		return "Unexpected error", 402
+		return json.dumps({"error": 102})
 
 
 if __name__ == "__main__":

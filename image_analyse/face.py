@@ -154,7 +154,7 @@ def get_sentiment(senti_graph, img, img_array):
 			for face_number in face_dict:
 				cropped_image = None
 				feature_vector = None
-				if len(face_dict) > 1:
+				if len(face_dict) > 0:
 					height_padding = 0.25*(face_dict[face_number]['bottom'] - face_dict[face_number]['top'])
 					width_padding = 0.25*(face_dict[face_number]['right'] - face_dict[face_number]['left'])
 					cropped_image = np.array(img_array[face_dict[face_number]['top'] - int(height_padding):face_dict[face_number]['bottom'] + int(height_padding),face_dict[face_number]['left'] - int(width_padding):face_dict[face_number]['right'] + int(width_padding)])
@@ -175,18 +175,18 @@ def get_sentiment(senti_graph, img, img_array):
 		#Populating the JSON that holds the Image Sentiment
 		image_sentiment_json = {}
 		if faceAbsent == 0:
-			image_sentiment_json["Face"] = {}
+			image_sentiment_json["Faces"] = {}
 			for face_number in score_dict:
 				try:
-					image_sentiment_json["Face"]["Face_"+str(face_number)] = {}
-					image_sentiment_json["Face"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
-					image_sentiment_json["Face"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
+					image_sentiment_json["Faces"]["Face_"+str(face_number)] = {}
+					image_sentiment_json["Faces"]["Face_"+str(face_number)]["Positive"] = round(score_dict[face_number][0],3)
+					image_sentiment_json["Faces"]["Face_"+str(face_number)]["Negative"] = round(score_dict[face_number][1],3)
 				except:
 					print "Error in face.py:",e
 			try: 
-				image_sentiment_json["Face"]["Average"] = {}
-				image_sentiment_json["Face"]["Average"]["Positive"] = round(positive_probability/denominator,3)
-				image_sentiment_json["Face"]["Average"]["Negative"] = round(negative_probability/denominator,3)
+				image_sentiment_json["Average"] = {}
+				image_sentiment_json["Average"]["Positive"] = round(positive_probability/denominator,3)
+				image_sentiment_json["Average"]["Negative"] = round(negative_probability/denominator,3)
 			except:
 				print "Error in face.py:",e
 		image_sentiment_json["Tensorflow_SentiBank"] = {}
