@@ -44,8 +44,7 @@ $ (document).ready( function() {
             } else if (url.indexOf("permalink") > -1 || url.indexOf("photos") > -1) {
               image_id = url.split("/")[url.split("/").length-2];
             }
-            // var access_token = "<ACCESS TOKEN FROM APP/IPOD>";
-            var access_token = "EAACEdEose0cBAMhBYEwF9UfdZBI0m5J2e01EBZA7JkmPNQ9tTGQ5UNGL6ZCaZCOGOj8Q4EZBLafYmzGnHmScyOw1lVc3lToSeevGHEWwa0eAUSmeHchM6jLuOeHUTHUXIQXMeIzTzIfsPHhYyd97zjFJFb3pgQ7uI7lSd9PPtSgZDZD";
+            var access_token = "EAADYPcrzZBmcBAJq6A9p3KjwzTwYRwfCVB1UbUdZBZAPneE3Sa6qAF2c57LwdzFLASWTf1Mg8SkAVaWwWzabkfddAfKE6s3EG8QyO4MnIngdA5eID48PQxZAd0CIZAMC8bwU6NK0nThhvqxQSkLfuCbrm7gxVrMzkv139BPg7RAZDZD";
             var graph_url = "https://graph.facebook.com/v2.3/" + image_id + "?fields=source&access_token=" + access_token;
             var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_url?image_url=";
             // Way to get send message compatibility over all chrome browser versions
@@ -103,28 +102,28 @@ $ (document).ready( function() {
                             }
                             var i = 1;
                             // Sentiment per face
-                            for (var key in senti['Face']) {
+                            for (var key in senti['Faces']) {
                                 inner_html += "<b>Face " + i.toString() + ": ";
-                                if(senti["Face"][key]["Positive"] > senti["Face"][key]["Negative"])
+                                if(senti["Faces"][key]["Positive"] > senti["Faces"][key]["Negative"])
                                 {
-                                    inner_html += "Positive sentiment</b> " + " (" + Math.round(100*senti["Face"][key]["Positive"]) + "% confidence)<br>";
+                                    inner_html += "Positive sentiment</b> " + " (" + Math.round(100*senti["Faces"][key]["Positive"]) + "% confidence)<br>";
                                 }
                                 else
                                 {
-                                    inner_html += "Negative sentiment</b> " + " (" + Math.round(100*senti["Face"][key]["Negative"]) + "% confidence)<br>";
+                                    inner_html += "Negative sentiment</b> " + " (" + Math.round(100*senti["Faces"][key]["Negative"]) + "% confidence)<br>";
                                 }
                                 i++;
                              }
-                             if(senti['Face']['Average']){
+                             if(senti['Average']){
 
                                 inner_html += "<b>Average sentiment (from faces):</b> ";
-                                if(senti['Face']['Average']['Positive'] > senti['Face']['Average']["Negative"])
+                                if(senti['Average']['Positive'] > senti['Average']["Negative"])
                                 {
-                                    inner_html += "Positive " + " (" + Math.round(100*senti['Face']['Average']['Positive']) + "% confidence)<br>";
+                                    inner_html += "Positive " + " (" + Math.round(100*senti['Average']['Positive']) + "% confidence)<br>";
                                 }
                                 else
                                 {
-                                    inner_html += "Negative " + " (" + Math.round(100*senti['Face']['Average']["Negative"]) + "% confidence)<br>";
+                                    inner_html += "Negative " + " (" + Math.round(100*senti['Average']["Negative"]) + "% confidence)<br>";
                                 }
                              }
                              var add_button = document.createElement("button");
