@@ -124,7 +124,7 @@ def analyze_fbid():
 	received = datetime.datetime.now()
 	client = MongoClient()
 	db = client['image_api']
-	# db.authenticate(USERNAME, PASSWORD) 
+	db.authenticate(USERNAME, PASSWORD) 
 	ds = db['v1.0']
 	try:
 		fb_id = request.args['id']
