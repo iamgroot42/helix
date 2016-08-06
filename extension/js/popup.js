@@ -49,9 +49,7 @@ $ (document).ready( function() {
           var elem = this;
           if($(this).find("._5ptz").length > 0 && $(this).find(".HelixAPIanalysis").length == 0) {
             var url = $(this).attr("href");
-            $(this).addClass("analysed");
-            $(this).append("<span class='HelixAPIanalysis'> </span>");
-
+            $(this).append("<span class='HelixAPIanalysis'>Analysing</span>");
             var image_id = "";
             var index = url.indexOf("fbid");
             if (index > -1) {
@@ -123,6 +121,7 @@ $ (document).ready( function() {
                     // Sweet alert
                     swal({title: "<small>Helix\'s analysis</small>", text: inner_html, html: true }); 
                   };
+                  // elem.insertAdjacentHTML('afterend', add_button.outerHTML);
                   elem.appendChild(add_button);
                 }
             });
