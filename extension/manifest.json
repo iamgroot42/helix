@@ -22,7 +22,8 @@
            "48": "icons/icon48.png",
           "128": "icons/icon128.png" 
     },
-  "web_accessible_resources": ["icons/icon16.png"],
+  "web_accessible_resources": ["icons/icon16.png", "icons/1.png", "icons/2.png", "icons/3.png",
+  "icons/4.png", "icons/5.png"],
   "permissions": [
     "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*"
   ],

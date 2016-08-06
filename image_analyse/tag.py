@@ -131,8 +131,9 @@ def tensor_inference(tag_graph, image):
     top_k = predictions.argsort()[-1:][::-1]
 
     tags = {}
-
+    node_mapping = -1
     for node_id in top_k:
+      node_mapping = node_id
       human_string = node_lookup.id_to_string(node_id)
       score = predictions[node_id]
       tags[human_string] = score
@@ -142,4 +143,4 @@ def tensor_inference(tag_graph, image):
     confidence = float(tags[tag])
     # confidence = [ float(tags[c]) for c in tag]
 
-    return {"tag": tag, "confidence": confidence}
+    return {"tag": tag, "tag_id": node_mapping, "confidence": confidence}
