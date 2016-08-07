@@ -96,11 +96,12 @@ $ (document).ready( function() {
                   }
                   // Sentiment from text, if any
                   if(text['sentiment'] != ""){
-                  	inner_html += "<b>Sentiment from text:</b> ";
                   	if(text['sentiment'] == "positive"){
+                  		inner_html += "<b>Sentiment from text:</b> ";
                   		inner_html += "<img src='" + which_icon(1) + "' height='32' width='32'> <br><br>";	
                   	}
-                  	else{
+                  	else if (text['sentiment'] == "negative"){
+                  		inner_html += "<b>Sentiment from text:</b> ";
                   		inner_html += "<img src='" + which_icon(0) + "' height='32' width='32'> <br><br>";		
                   	}
                   }
