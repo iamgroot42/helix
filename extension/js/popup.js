@@ -90,6 +90,20 @@ $ (document).ready( function() {
                 	var tag = obj['tag'];
                 	var text = obj['text'];
                   var inner_html = "";
+                  // Text,if any
+                  if(text['text'] != ""){
+                  	inner_html += "<b>Text in image: </b>" + text['text'] +"<br><br>";
+                  }
+                  // Sentiment from text, if any
+                  if(text['sentiment'] != ""){
+                  	inner_html += "<b>Sentiment from text:</b> ";
+                  	if(text['sentiment'] == "positive"){
+                  		inner_html += "<img src='" + which_icon(1) + "' height='32' width='32'> <br><br>";	
+                  	}
+                  	else{
+                  		inner_html += "<img src='" + which_icon(0) + "' height='32' width='32'> <br><br>";		
+                  	}
+                  }
                   // Inceptionv3 tag
                   inner_html += "<b>" + dumb_mapping[tag['tag_id']] +"</b> (" + Math.round(100*tag['confidence']) + "% confidence)<br><br>";
                   // Sentibank model sentiment
@@ -114,12 +128,13 @@ $ (document).ready( function() {
                   var add_button = document.createElement("button");
                   add_button.id = "helix_button";
                   add_button.style = {
-                  		"background-color": "#9c27b0",
+                  		"background-color": "#e0b3ff",
               			"margin-left": "4px", 
               			"border": "none",
               			"color": "white"
               		};
-                  add_button.setAttribute("style", "margin-left:5px;background-color:#9c27b0;border:none;color:white");
+              	  inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit http://precog.iiitd.edu.in/osm.html#helix</p>";
+                  add_button.setAttribute("style", "margin-left:5px;background-color:#e0b3ff;border:none;color:white");
                   add_button.innerHTML = "Helix says..";
                   add_button.onclick = function(){
                     // Sweet alert

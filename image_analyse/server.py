@@ -84,7 +84,8 @@ def tag_part(img, dictio):
 
 
 def text_part(temp_image, dictio):
-	dictio['text'] = pytesseract.image_to_string(temp_image, lang = 'eng').replace('\n',' ')
+	dictio['text'] = {'text': pytesseract.image_to_string(temp_image, lang = 'eng').replace('\n',' '),
+	'sentiment': 'potato'}
 
 
 def image_summary(img):
@@ -116,6 +117,21 @@ def handle(x):
 		return -1
 	else:
 		return x
+
+
+@app.route("/analyze_image",  methods=['POST'])
+def analyze_image():
+	try:
+		imagefile = request.files['imagefile']
+		img =  imagefile.stream.read()
+		try:
+			return json.dumps(image_summary(img).copy())
+		except Exception, e:
+			print "Error in server.py:",e
+			return json.dumps({"error": 101})
+	except Exception, e:
+		print "Error in server.py:",e
+		return json.dumps({"error": 100})
 
 
 @app.route("/analyze_fbid",  methods=['GET'])
