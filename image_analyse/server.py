@@ -5,6 +5,7 @@ from multiprocessing import Process, Manager
 from pymongo import MongoClient
 from datetime import timedelta
 from functools import update_wrapper
+from textblob import TextBlob
 
 
 from PIL import Image
@@ -84,8 +85,18 @@ def tag_part(img, dictio):
 
 
 def text_part(temp_image, dictio):
-	dictio['text'] = {'text': pytesseract.image_to_string(temp_image, lang = 'eng').replace('\n',' '),
-	'sentiment': 'potato'}
+	text = pytesseract.image_to_string(temp_image, lang = 'eng').replace('\n',' ')
+	blob = TextBlob(text)
+	sentiment = ''
+	try:
+		if blob.detect_language() == 'en':
+			if blob.sentiment.polarity >= 0:
+				sentiment = 'positive'
+			else:
+				sentiment = 'negative'
+	except:
+		sentiment = ''	
+	dictio['text'] = {'text': text,	'sentiment': sentiment}
 
 
 def image_summary(img):
