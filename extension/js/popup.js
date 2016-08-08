@@ -95,7 +95,7 @@ $ (document).ready( function() {
                   // 	inner_html += "<b>Text in image: </b>" + text['text'] +"<br><br>";
                   // }
                   // Sentiment from text, if any
-                  if(text['sentiment'] != {}){
+                  if("Positive" in text['sentiment']){
                   	inner_html += "<b>Sentiment from text:</b> ";
                   	inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'><br><br>";
                   }
