@@ -91,19 +91,13 @@ $ (document).ready( function() {
                 	var text = obj['text'];
                   var inner_html = "";
                   // Text,if any
-                  if(text['text'] != ""){
-                  	inner_html += "<b>Text in image: </b>" + text['text'] +"<br><br>";
-                  }
+                  // if(text['text'] != ""){
+                  // 	inner_html += "<b>Text in image: </b>" + text['text'] +"<br><br>";
+                  // }
                   // Sentiment from text, if any
-                  if(text['sentiment'] != ""){
-                  	if(text['sentiment'] == "positive"){
-                  		inner_html += "<b>Sentiment from text:</b> ";
-                  		inner_html += "<img src='" + which_icon(1) + "' height='32' width='32'> <br><br>";	
-                  	}
-                  	else if (text['sentiment'] == "negative"){
-                  		inner_html += "<b>Sentiment from text:</b> ";
-                  		inner_html += "<img src='" + which_icon(0) + "' height='32' width='32'> <br><br>";		
-                  	}
+                  if(text['sentiment'] != {}){
+                  	inner_html += "<b>Sentiment from text:</b> ";
+                  	inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'>";
                   }
                   // Inceptionv3 tag
                   inner_html += "<b>" + dumb_mapping[tag['tag_id']] +"</b> (" + Math.round(100*tag['confidence']) + "% confidence)<br><br>";
@@ -136,7 +130,7 @@ $ (document).ready( function() {
               		};
               	  inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit http://precog.iiitd.edu.in/osm.html#helix</p>";
                   add_button.setAttribute("style", "margin-left:5px;background-color:#e0b3ff;border:none;color:white");
-                  add_button.innerHTML = "Helix says..";
+                  add_button.innerHTML = " Helix says.. ";
                   add_button.onclick = function(){
                     // Sweet alert
                     swal({title: "Helix\'s analysis", text: inner_html, html: true }); 

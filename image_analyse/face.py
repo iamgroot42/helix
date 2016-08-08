@@ -173,9 +173,8 @@ def get_sentiment(senti_graph, img, img_array):
 	
 	
 		#Populating the JSON that holds the Image Sentiment
-		image_sentiment_json = {}
+		image_sentiment_json = {'Faces':{}, 'Average':{}}
 		if faceAbsent == 0:
-			image_sentiment_json["Faces"] = {}
 			for face_number in score_dict:
 				try:
 					image_sentiment_json["Faces"]["Face_"+str(face_number)] = {}
@@ -192,7 +191,7 @@ def get_sentiment(senti_graph, img, img_array):
 		image_sentiment_json["Tensorflow_SentiBank"] = {}
 		image_sentiment_json["Tensorflow_SentiBank"]["Positive"] = positive_inception_score
 		image_sentiment_json["Tensorflow_SentiBank"]["Negative"] = negative_inception_score
-	
+		print image_sentiment_json
 		return image_sentiment_json
 	except Exception,e:
 		print "Error in face.py:",e

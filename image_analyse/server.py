@@ -87,15 +87,13 @@ def tag_part(img, dictio):
 def text_part(temp_image, dictio):
 	text = pytesseract.image_to_string(temp_image, lang = 'eng').replace('\n',' ')
 	blob = TextBlob(text)
-	sentiment = ''
+	sentiment = {}
 	try:
 		if blob.detect_language() == 'en':
-			if blob.sentiment.polarity >= 0:
-				sentiment = 'positive'
-			else:
-				sentiment = 'negative'
+			sentiment['Positive'] = (blob.sentiment.polarity + 1.0)/2.0
+			sentiment['Negative'] = 1.0 - sentiment['Positive']
 	except:
-		sentiment = ''	
+		sentiment = {}	
 	dictio['text'] = {'text': text,	'sentiment': sentiment}
 
 

@@ -11,7 +11,6 @@
     <title>Helix</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <link href="css/one-page-wonder.css" rel="stylesheet">
 
 </head>
@@ -94,7 +93,7 @@
             </h2>
             <p class="lead">
             <b>Format of JSON returned:</b><br>
-            {'text': {'text':'string, text found in image', 'sentiment':'sentiment inferred from text (positive/negative/empty)'}, 'tag':{'tag': 'text, tag produced by inceptionv3, 'confidence':'confidence value associated with tag', 'tag_id':'id of the tag corresponding to the tag (not required for normal API use'}, 'sentiment':{'Tensorflow_SentiBank:{'Positive': 'fraction of positive sentiment in image overall', 'Negative': 'fraction of negative sentiment in image overall'}, 'Faces':{'Face_0':{'Positive':'', 'Negative':''},....}, 'Average':{'Positive':'', 'Negative':''}}}
+            {'text': {'text':'string, text found in image', 'sentiment':{'Positive':'', 'Negative':''}}, 'tag':{'tag': 'text, tag produced by inceptionv3, 'confidence':'confidence value associated with tag', 'tag_id':'id of the tag corresponding to the tag (not required for normal API use'}, 'sentiment':{'Tensorflow_SentiBank:{'Positive': 'fraction of positive sentiment in image overall', 'Negative': 'fraction of negative sentiment in image overall'}, 'Faces':{'Face_0':{'Positive':'', 'Negative':''},....}, 'Average':{'Positive':'', 'Negative':''}}}
             <br><br><b>Error codes:</b><br>
             <ul>
             <li><i>100: </i> error downloading image</li>
@@ -115,6 +114,13 @@
             <p class="lead">
             Available on the Chrome Web Store and Mozilla's Web Store.
             Read more about this <a href="http://precog.iiitd.edu.in/osm.html#helix"> here </a>.
+            Try uploading an image and see it for yourself!<br>
+                <form action="labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_image" method="post" enctype="multipart/form-data">
+                <b>Upload image (JPEG):</b><br><br>
+                    <input type="file" name="imagefile" id="imagefile">
+                    <br>
+                    <input type="submit" value="Upload Image" name="submit">
+                    </form>
             </p>
         </div>
 
