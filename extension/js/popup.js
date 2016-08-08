@@ -44,106 +44,114 @@ $ (document).ready( function() {
   })();
 
 
+var main_stuff = function(elem) {
+	var url = $(elem).attr("href");
+	$(elem).append("<span class='HelixAPIanalysis'> Helix at work</span>");
+	var image_id = "";
+	var index = url.indexOf("fbid");
+	if (index > -1) {
+		image_id = url.substring(index + 5, url.indexOf("&", index + 5));
+       }
+	else if (url.indexOf("posts") > -1) {
+		image_id = url.split("/")[url.split("/").length-1];
+	} else if (url.indexOf("permalink") > -1 || url.indexOf("photos") > -1) {
+		image_id = url.split("/")[url.split("/").length-2];
+	}
+	var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_fbid?id=";
+	if(image_id == ""){
+		// jQuery's 'each' treats return true as continue, return false as break
+		return true;
+	}
+	// Way to get send message compatibility over all chrome browser versions
+	if (!chrome.runtime) {
+		// Chrome 20-21
+		chrome.runtime = chrome.extension;
+	} else if(!chrome.runtime.onMessage) {
+		// Chrome 22-25
+		chrome.runtime.onMessage = chrome.extension.onMessage;
+		chrome.runtime.sendMessage = chrome.extension.sendMessage;
+		chrome.runtime.onConnect = chrome.extension.onConnect;
+		chrome.runtime.connect = chrome.extension.connect;
+	}
+	// Send GET request to HelixAPI
+	chrome.runtime.sendMessage({
+		method: 'GET',
+		action: 'xhttp',
+		url: apiCallUrl,
+		data : image_id
+		}, function (responseText) {
+			$(elem).find(".HelixAPIanalysis").html("");
+			var obj = JSON.parse(responseText);
+			if(!("error" in obj)){
+				var senti = obj['sentiment'];
+				var tag = obj['tag'];
+				var text = obj['text'];
+				var inner_html = "";
+				if("Positive" in text['sentiment']){
+					inner_html += "<b>Sentiment from text:</b> ";
+					inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'><br><br>";
+				}
+				// Inceptionv3 tag
+				inner_html += "<b>" + dumb_mapping[tag['tag_id']] +"</b> (" + Math.round(100*tag['confidence']) + "% confidence)<br><br>";
+				// Sentibank model sentiment
+				inner_html += "<b>Overall sentiment:</b> ";
+				inner_html += "<img src='" + which_icon(senti["Tensorflow_SentiBank"]["Positive"]) + "' height='32' width='32'> <br><br>";
+				var i = 1;
+				// Sentiment per face
+				for (var key in senti['Faces']) {
+					if(senti["Faces"][key]["Positive"] != undefined){
+					if(i==1){
+						inner_html += "<b>Sentiment (from faces):</b> ";
+					}
+					inner_html += "<img src='" + which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
+					i++;
+					} 
+				}
+				if(i>1){
+					inner_html += "<br><br>";
+				}
+				if(senti['Average']){
+					if(senti['Average']['Positive'] != undefined){
+						inner_html += "<b>Average sentiment (from faces):</b> ";
+						inner_html += "<img src='" + which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
+					}
+				}
+				var add_button = document.createElement("button");
+				add_button.id = "helix_button";
+				add_button.style = {
+					"background-color": "#e0b3ff",
+					"margin-left": "4px", 
+					"border": "none",
+					"color": "white"
+				};
+				inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit <a href='http://precog.iiitd.edu.in/osm.html#helix'> Helix </a></p>";
+				add_button.setAttribute("style", "margin-left:5px;background-color:#e0b3ff;border:none;color:white");
+				add_button.innerHTML = " Helix says.. ";
+				add_button.onclick = function(){
+				// Sweet alert
+					swal({title: "Helix\'s analysis", text: inner_html, html: true }); 
+				};
+				elem.insertAdjacentElement('afterend', add_button);
+			}
+	});
+};
+
   if (document.getElementById('globalContainer') !== null) {   
     observeDOM( document.getElementById('globalContainer') ,function(){
-        $("._5pcq").each(function() {
-          var elem = this;
-          if($(this).find("._5ptz").length > 0 && $(this).find(".HelixAPIanalysis").length == 0) {
-            var url = $(this).attr("href");
-            $(this).append("<span class='HelixAPIanalysis'></span>");
-            var image_id = "";
-            var index = url.indexOf("fbid");
-            if (index > -1) {
-              image_id = url.substring(index + 5, url.indexOf("&", index + 5));
-            }
-            else if (url.indexOf("posts") > -1) {
-              image_id = url.split("/")[url.split("/").length-1];
-            } else if (url.indexOf("permalink") > -1 || url.indexOf("photos") > -1) {
-              image_id = url.split("/")[url.split("/").length-2];
-            }
-            var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_fbid?id=";
-            if(image_id == ""){
-              // jQuery's 'each' treats return true as continue, return false as break
-              return true;
-            }
-            // Way to get send message compatibility over all chrome browser versions
-            if (!chrome.runtime) {
-              // Chrome 20-21
-              chrome.runtime = chrome.extension;
-            } else if(!chrome.runtime.onMessage) {
-              // Chrome 22-25
-              chrome.runtime.onMessage = chrome.extension.onMessage;
-              chrome.runtime.sendMessage = chrome.extension.sendMessage;
-              chrome.runtime.onConnect = chrome.extension.onConnect;
-              chrome.runtime.connect = chrome.extension.connect;
-            }
-            // Send GET request to HelixAPI
-            chrome.runtime.sendMessage({
-              method: 'GET',
-              action: 'xhttp',
-              url: apiCallUrl,
-              data : image_id
-              }, function (responseText) {
-                var obj = JSON.parse(responseText);
-                if(!("error" in obj)){
-                	var senti = obj['sentiment'];
-                	var tag = obj['tag'];
-                	var text = obj['text'];
-                  var inner_html = "";
-                  // Text,if any
-                  // if(text['text'] != ""){
-                  // 	inner_html += "<b>Text in image: </b>" + text['text'] +"<br><br>";
-                  // }
-                  // Sentiment from text, if any
-                  if("Positive" in text['sentiment']){
-                  	inner_html += "<b>Sentiment from text:</b> ";
-                  	inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'><br><br>";
-                  }
-                  // Inceptionv3 tag
-                  inner_html += "<b>" + dumb_mapping[tag['tag_id']] +"</b> (" + Math.round(100*tag['confidence']) + "% confidence)<br><br>";
-                  // Sentibank model sentiment
-                  inner_html += "<b>Overall sentiment:</b> ";
-                  inner_html += "<img src='" + which_icon(senti["Tensorflow_SentiBank"]["Positive"]) + "' height='32' width='32'> <br><br>";
-                  var i = 1;
-                  // Sentiment per face
-                  for (var key in senti['Faces']) {
-                  	if(senti["Faces"][key]["Positive"] != undefined){
-                      	if(i==1){
-                        	inner_html += "<b>Sentiment (from faces):</b> ";
-                      	}
-                      	inner_html += "<img src='" + which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
-                      	i++;
-                      } 
-                   }
-                  if(i>1){
-                    inner_html += "<br><br>";
-                  }
-                  if(senti['Average']){
-                  	if(senti['Average']['Positive'] != undefined){
-                      	inner_html += "<b>Average sentiment (from faces):</b> ";
-                      	inner_html += "<img src='" + which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
-                      }
-                   }
-                  var add_button = document.createElement("button");
-                  add_button.id = "helix_button";
-                  add_button.style = {
-                  		"background-color": "#e0b3ff",
-              			"margin-left": "4px", 
-              			"border": "none",
-              			"color": "white"
-              		};
-              	  inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit <a href='http://precog.iiitd.edu.in/osm.html#helix'> Helix </a></p>";
-                  add_button.setAttribute("style", "margin-left:5px;background-color:#e0b3ff;border:none;color:white");
-                  add_button.innerHTML = " Helix says.. ";
-                  add_button.onclick = function(){
-                    // Sweet alert
-                    swal({title: "Helix\'s analysis", text: inner_html, html: true }); 
-                  };
-                  elem.insertAdjacentElement('afterend', add_button);
-                }
-            });
-          }
-        });
+    	// For images opened in theatre mode
+    	$("._39g5").each(function(){
+    		var elem = this;
+    		if($(this).find(".HelixAPIanalysis").length == 0) {
+				main_stuff(elem);
+        	}
+    	});
+    	// For posts in feed
+        $("._5pcq").each(function(){
+    		var elem = this;
+			if($(this).find("._5ptz").length > 0 && $(this).find(".HelixAPIanalysis").length == 0) {
+				main_stuff(elem);
+        	}
+    	});
     });
   }
 });
