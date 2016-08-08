@@ -107,18 +107,22 @@ $ (document).ready( function() {
                   var i = 1;
                   // Sentiment per face
                   for (var key in senti['Faces']) {
-                      if(i==1){
-                        inner_html += "<b>Sentiment (from faces):</b> ";
-                      }
-                      inner_html += "<img src='" + which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
-                      i++;
+                  	if(senti["Faces"][key]["Positive"] != undefined){
+                      	if(i==1){
+                        	inner_html += "<b>Sentiment (from faces):</b> ";
+                      	}
+                      	inner_html += "<img src='" + which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
+                      	i++;
+                      } 
                    }
                   if(i>1){
                     inner_html += "<br><br>";
                   }
                   if(senti['Average']){
-                      inner_html += "<b>Average sentiment (from faces):</b> ";
-                      inner_html += "<img src='" + which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
+                  	if(senti['Average']['Positive'] != undefined){
+                      	inner_html += "<b>Average sentiment (from faces):</b> ";
+                      	inner_html += "<img src='" + which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
+                      }
                    }
                   var add_button = document.createElement("button");
                   add_button.id = "helix_button";
