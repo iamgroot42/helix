@@ -59,6 +59,7 @@ var main_stuff = function(elem) {
 	}
 	var apiCallUrl =  "http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_fbid?id=";
 	if(image_id == ""){
+		$(elem).find(".HelixAPIanalysis").html("");
 		// jQuery's 'each' treats return true as continue, return false as break
 		return true;
 	}
