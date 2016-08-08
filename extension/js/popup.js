@@ -97,7 +97,7 @@ $ (document).ready( function() {
                   // Sentiment from text, if any
                   if(text['sentiment'] != {}){
                   	inner_html += "<b>Sentiment from text:</b> ";
-                  	inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'>";
+                  	inner_html += "<img src='" + which_icon(text['sentiment']["Positive"]) + "' height='32' width='32'><br><br>";
                   }
                   // Inceptionv3 tag
                   inner_html += "<b>" + dumb_mapping[tag['tag_id']] +"</b> (" + Math.round(100*tag['confidence']) + "% confidence)<br><br>";
