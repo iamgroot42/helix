@@ -21,6 +21,27 @@ var which_icon = function(positive_confidence){
     return chrome.extension.getURL("icons/" + icon + ".png");
 };
 
+
+var modified_which_icon = function(positive_confidence){
+    if(positive_confidence >= 0.75){
+      icon = "5";
+    }
+    else if(positive_confidence >= 0.52){
+      icon = "4";
+    }
+    else if(positive_confidence >= 0.48){
+      icon = "3";
+    }
+    else if(positive_confidence >= 0.25){
+      icon = "2";
+    }
+    else{
+      icon = "1";
+    }
+    return chrome.extension.getURL("icons/" + icon + ".png");
+};
+
+
 $ (document).ready( function() {
   var observeDOM = (function(){
       var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
@@ -104,7 +125,7 @@ var main_stuff = function(elem) {
 					if(i==1){
 						inner_html += "<b>Sentiment (from faces):</b> ";
 					}
-					inner_html += "<img src='" + which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
+					inner_html += "<img src='" + modified_which_icon(senti["Faces"][key]["Positive"]) + "' height='32' width='32'>";
 					i++;
 					} 
 				}
@@ -114,7 +135,7 @@ var main_stuff = function(elem) {
 				if(senti['Average']){
 					if(senti['Average']['Positive'] != undefined){
 						inner_html += "<b>Average sentiment (from faces):</b> ";
-						inner_html += "<img src='" + which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
+						inner_html += "<img src='" + modified_which_icon(senti['Average']['Positive']) + "' height='32' width='32'> <br>";
 					}
 				}
 				var add_button = document.createElement("button");
