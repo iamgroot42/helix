@@ -17,6 +17,7 @@ import sys
 import datetime
 import hashlib
 import json
+import urlparse
 
 
 app = Flask(__name__)
@@ -165,8 +166,17 @@ def analyze_fbid():
 			if k != -1:
 				image_url = image_url[:k] + ".jpg" + image_url[k+1:]
 		except Exception,e:
-			print "Error in server.py:",e
-			return json.dumps({"error": 104})
+			# Link to external source, extract preview image
+			try:
+				graph_url = "https://graph.facebook.com/v2.3/" + fb_id + "?fields=picture&access_token=" + ACCESS_TOKEN
+				graph_req = urllib2.Request(graph_url, headers = {'User-Agent': 'Mozilla/5.0'})				
+				graph_response = urllib2.urlopen(graph_req)
+				graph_obj = json.loads(graph_response.read())
+				image_url = graph_obj['picture']
+				image_url = urlparse.parse_qs(urlparse.urlparse(image_url).query)['url'][0]
+			except Exception,e:
+				print "Error in server.py:",e
+				return json.dumps({"error": 104})
 		req = urllib2.Request(image_url, headers = {'User-Agent': 'Mozilla/5.0'})
 		response = urllib2.urlopen(req)
 		img = response.read()
