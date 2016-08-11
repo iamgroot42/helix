@@ -1,0 +1,16 @@
+{
+  "title": "Helix",
+  "name": "Helix",
+  "version": "1.0.0",
+  "description": "Understanding the 1,000 words of a picture",
+  "main": "index.js",
+  "author": "Anshuman Suri, Prateek Dewan",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "permissions": {
+    "cross-domain-content": ["http://labs.precog.iiitd.edu.in/resources/HelixAPI/*"]
+  },
+  "license": "MIT"
+}

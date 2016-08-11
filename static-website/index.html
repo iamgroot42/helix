@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+
+    <title>Helix</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/one-page-wonder.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Helix</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#about">About</a>
+                    </li>
+                    <li>
+                        <a href="#API">HelixAPI</a>
+                    </li>
+                    <li>
+                        <a href="#APIextended">HelixAPI (more)</a>
+                    </li>
+                    <li>
+                        <a href="#browser">Browser extension</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="header-image">
+        <div class="headline">
+            <div class="container">
+                <h1>Helix</h1>
+                    <h3>Understanding the 1,000 words of a picture</h3>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <hr class="featurette-divider">
+
+        <div class="featurette" id="about">
+        <br><br><br>
+            <img class="featurette-image img-circle img-responsive pull-right" src="http://placehold.it/500x500">
+            <h2 class="featurette-heading">Online Social Networks (OSNs)
+                <span class="text-muted">are populated with billions of images</span>
+            </h2>
+            <p class="lead">With more than <b>350 million</b> images being uploaded daily on Facebook itself, extracting meaningful content from images has become more important that ever. As a preliminary step towards understanding and interpreting image content from a human perspective, we propose Helix, a system that tries to extract some meaningful, human understandable features from an image. Helix summarizes an image with the following: sentiment of the image, sentiment of faces present in the image (if any), and a text label for the image. These features can be used by researchers for image coding, categorization and summarization tasks on a large scale, which are currently carried out manually through human annotation.</p>
+        </div>
+
+        <hr class="featurette-divider">
+
+        <div class="featurette" id="API">
+        <br><br><br>
+            <img class="featurette-image img-circle img-responsive pull-left" src="http://placehold.it/500x500">
+            <h2 class="featurette-heading">We offer an API as well
+                <span class="text-muted">HelixAPI.</span>
+            </h2>
+            <p class="lead">Our API provides the following endpoints:
+                <ul>
+                    <li>GET <i>analyze_fbid</i> : takes a parameter 'id', which is the Facebook object ID for a public object with an image associated with it. Returned JSON is either the one described below, or of the form {"error":code}, where 'code' is one of the error codes (described below).</li>
+                    <li>GET <i>analyze_url</i> : takes a parameter 'image_url', which is a URL pointing to a publically accessible JPEG file. Returned JSON is either the one described below, or of the form {"error":code}, where 'code' is one of the error codes (described below).</li>
+                    <li>POST <i>analyze_image</i> : takes a JPEG image 'imagefile'. Returned JSON is either the one described below, or of the form {"error":code}, where 'code' is one of the error codes (described below).</li>
+                </ul>
+            </p>
+        </div>
+
+        <hr class="featurette-divider">
+
+        <div class="featurette" id="APIextended">
+        <br><br><br>
+            <img class="featurette-image img-circle img-responsive pull-right" src="http://placehold.it/500x500">
+            <h2 class="featurette-heading">More
+                <span class="text-muted">API details</span>
+            </h2>
+            <p class="lead">
+            <b>Format of JSON returned:</b><br>
+            {'text': {'text':'string, text found in image', 'sentiment':{'Positive':'', 'Negative':''}}, 'tag':{'tag': 'text, tag produced by inceptionv3, 'confidence':'confidence value associated with tag', 'tag_id':'id of the tag corresponding to the tag (not required for normal API use'}, 'sentiment':{'Tensorflow_SentiBank:{'Positive': 'fraction of positive sentiment in image overall', 'Negative': 'fraction of negative sentiment in image overall'}, 'Faces':{'Face_0':{'Positive':'', 'Negative':''},....}, 'Average':{'Positive':'', 'Negative':''}}}
+            <br><br><b>Error codes:</b><br>
+            <ul>
+            <li><i>100: </i> error downloading image</li>
+            <li><i>101: </i> not JPEG image</li>
+            <li><i>102: </i> unexpected error, contact admin</li>
+            <li><i>104: </i> requested FB ID isn't that of an image</li>
+            </ul>
+            </p>
+        </div>
+
+         <hr class="featurette-divider">
+
+        <div class="featurette" id="browser">
+        <br><br><br>
+            <img class="featurette-image img-circle img-responsive pull-left" src="http://placehold.it/500x500">
+            <h2 class="featurette-heading">Try our extensions
+                <span class="text-muted">on Chrome and Firefox</span>
+            </h2>
+            <p class="lead">
+            Available on the <a href="https://chrome.google.com/webstore/detail/helix/oglhnfadnhnhlklcppijcnbgjacliagj?utm_source=chrome-ntp-icon" target="_blank">Chrome Web Store</a> and Mozilla's Web Store.
+            Read more about this <a href="http://precog.iiitd.edu.in/osm.html#helix" target="_blank"> here</a>.
+            Try uploading an image and see it for yourself!<br>
+                <form action="http://labs.precog.iiitd.edu.in/resources/HelixAPI/analyze_image" method="post" enctype="multipart/form-data">
+                <b>Upload image (JPEG):</b><br><br>
+                    <input type="file" name="imagefile" id="imagefile">
+                    <br>
+                    <input type="submit" value="Upload Image" name="submit">
+                    </form>
+            </p>
+        </div>
+
+        <hr class="featurette-divider">
+
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Developed as part of research at <a href="http://precog.iiitd.edu.in/" target="_blank">Precog Labs @ IIITD</a><br> For more information, please visit http://precog.iiitd.edu.in/osm.html#helix</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
