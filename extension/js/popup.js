@@ -146,7 +146,7 @@ var main_stuff = function(elem) {
 					"border": "none",
 					"color": "white"
 				};
-				inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit <a href='http://precog.iiitd.edu.in/osm.html#helix'> Helix </a></p>";
+				inner_html += "<br><p>Developed as part of research at <a href='http://precog.iiitd.edu.in/'' target='_blank'>Precog Labs @ IIITD</a><br> For more information, please visit <a href='http://precog.iiitd.edu.in/osm.html#helix' target='_blank'> Helix </a></p>";
 				add_button.setAttribute("style", "margin-left:5px;background-color:#e0b3ff;border:none;color:white");
 				add_button.innerHTML = " Helix says.. ";
 				add_button.onclick = function(){
