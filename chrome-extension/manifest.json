@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "HelixAPI",
-  "description": "potato",
-  "version": "0.5",
+  "name": "Helix",
+  "description": "Understanding the 1,000 words of a picture",
+  "version": "1.0",
   "browser_action": {
     "default_popup": "html/popup.html"
   },
