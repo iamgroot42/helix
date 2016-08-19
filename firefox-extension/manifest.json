@@ -29,5 +29,10 @@
   ],
   "externally_connectable" : {
     "matches": [ "http://labs.precog.iiitd.edu.in/resources/HelixAPI/*" ]
+  },
+  "applications": {
+  	"gecko": {
+	    "id": "anshuman14021@iiitd.ac.in"
+  	}
   }
 }

@@ -67,6 +67,7 @@ $ (document).ready( function() {
 
 var main_stuff = function(elem) {
 	var url = $(elem).attr("href");
+	var fb_alt_text = $(elem).attr("alt");
 	$(elem).append("<span class='HelixAPIanalysis'> Helix at work</span>");
 	var image_id = "";
 	var index = url.indexOf("fbid");
@@ -132,6 +133,7 @@ var main_stuff = function(elem) {
 				if(i>1){
 					inner_html += "<br><br>";
 				}
+				// Average sentiment
 				if(senti['Average']){
 					if(senti['Average']['Positive'] != undefined){
 						inner_html += "<b>Average sentiment (from faces):</b> ";
