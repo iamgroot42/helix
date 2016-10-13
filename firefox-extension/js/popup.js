@@ -49,12 +49,10 @@ $ (document).ready( function() {
 
       return function(obj, callback){
           if( MutationObserver ){
-              // define a new observer
               var obs = new MutationObserver(function(mutations, observer){
                   if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
                       callback();
               });
-              // have the observer observe foo for changes in children
               obs.observe( obj, { childList:true, subtree:true });
           }
           else if( eventListenerSupported ){
@@ -67,7 +65,7 @@ $ (document).ready( function() {
 
 var main_stuff = function(elem) {
 	var url = $(elem).attr("href");
-	$(elem).append("<span class='HelixAPIanalysis'> Helix at work</span>");
+	$(elem).append($('<span>', {class:'HelixAPIanalysis'}).text('Helix at work'));
 	var image_id = "";
 	var index = url.indexOf("fbid");
 	if (index > -1) {
